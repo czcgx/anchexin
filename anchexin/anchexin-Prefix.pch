@@ -13,4 +13,8 @@
 #ifdef __OBJC__
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
+
+    #import "Config.h" //配置文件
+    #import "AppDelegate.h"
+
 #endif
