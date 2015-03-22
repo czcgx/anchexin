@@ -7,15 +7,19 @@
 //
 
 #import "BaseViewController.h"
-#import "RegisterViewController.h"
 
 @interface LoginAndResigerViewController : BaseViewController
 {
     UITextField *userTextField;
     
-    UITextField *pwdTextField;
+    UITextField *codeTextField;
+    UILabel *checkLabel;
+    UIButton *checkButton;
     
+    int times;
     
+    NSTimer *timer;
+    int requestTimes;
 }
 
 @end

@@ -26,7 +26,7 @@
 //刷新城市
 -(void)refreshCity:(NSNotification *)sender
 {
-    NSLog(@"sender::%@",sender.object);
+   // NSLog(@"sender::%@",sender.object);
   
     txt3.text=@"";
     txt4.text=@"";
@@ -153,46 +153,80 @@
     
     [self.view addSubview:mainView];
     
-    //画板
-    actionSheet=[[UIActionSheet alloc] initWithTitle:@"\n\n\n\n\n\n\n\n\n\n\n\n"
-                                            delegate:self
-                                   cancelButtonTitle:nil
-                              destructiveButtonTitle:nil
-                                   otherButtonTitles:nil];
     
-    UIToolbar *toolBar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
-    toolBar.barStyle = UIBarStyleDefault;
-    toolBar.backgroundColor=[UIColor clearColor];
-    toolBar.barTintColor=[UIColor blackColor];
-    //空白
-    UIBarButtonItem *FixedButton=[[UIBarButtonItem alloc] initWithBarButtonSystemItem:
-                                  UIBarButtonSystemItemFlexibleSpace
-                                                                               target: nil
-                                                                               action: nil];
-    //完成
-    UIBarButtonItem *RightButton=[[UIBarButtonItem alloc] initWithTitle:@"完成"
-                                                                  style: UIBarButtonItemStyleDone
-                                                                 target: self
-                                                                 action: @selector(doneYes)];
-    RightButton.tintColor=[UIColor whiteColor];
-    //取消
-    UIBarButtonItem *LeftButton=[[UIBarButtonItem alloc] initWithTitle:@"取消"
-                                                                 style: UIBarButtonItemStyleDone
-                                                                target: self
-                                                                action: @selector(cancelNo)];
-    LeftButton.tintColor=[UIColor whiteColor];
-    NSArray *array = [[NSArray alloc] initWithObjects:LeftButton,FixedButton,FixedButton,FixedButton,RightButton, nil];
-    [toolBar setItems: array];
-    [actionSheet addSubview:toolBar];
-    
-    //创建PickerView的信息
-    picker= [[UIPickerView alloc] initWithFrame:CGRectMake(0, 44, WIDTH, 216)];//显示数据面板
-    picker.delegate=self;//显示数据
-    picker.dataSource=self;
-    picker.showsSelectionIndicator = YES;//选中得显示杠
-    picker.backgroundColor=[UIColor whiteColor];
-    //创建PickerView的信息
-    [actionSheet addSubview:picker];//显示数据面板
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0) {
+
+        //创建PickerView的信息
+        picker= [[UIPickerView alloc] initWithFrame:CGRectMake(0, 0, WIDTH, 216)];//显示数据面板
+        picker.delegate=self;//显示数据
+        picker.dataSource=self;
+        picker.showsSelectionIndicator = YES;//选中得显示杠
+        picker.backgroundColor=[UIColor clearColor];
+        
+        alertController=[UIAlertController alertControllerWithTitle:nil message:@"\n\n\n\n\n\n\n\n\n\n\n\n" preferredStyle:UIAlertControllerStyleActionSheet];
+        
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"完成" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action)
+                                       
+                                       {
+                                           
+                                           ////todo
+                                           
+                                       }];
+        
+        [alertController.view addSubview:picker];
+        [alertController addAction:cancelAction];
+        
+    }
+    else
+    {
+        
+        //画板
+        actionSheet=[[UIActionSheet alloc] initWithTitle:@"\n\n\n\n\n\n\n\n\n\n\n\n"
+                                                delegate:self
+                                       cancelButtonTitle:nil
+                                  destructiveButtonTitle:nil
+                                       otherButtonTitles:nil];
+        
+        UIToolbar *toolBar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
+        toolBar.barStyle = UIBarStyleDefault;
+        toolBar.backgroundColor=[UIColor clearColor];
+        if ([[UIDevice currentDevice].systemVersion floatValue] >= 7.0)
+        {
+             toolBar.barTintColor=[UIColor blackColor];
+        }
+       
+        //空白
+        UIBarButtonItem *FixedButton=[[UIBarButtonItem alloc] initWithBarButtonSystemItem:
+                                      UIBarButtonSystemItemFlexibleSpace
+                                                                                   target: nil
+                                                                                   action: nil];
+        //完成
+        UIBarButtonItem *RightButton=[[UIBarButtonItem alloc] initWithTitle:@"完成"
+                                                                      style: UIBarButtonItemStyleDone
+                                                                     target: self
+                                                                     action: @selector(doneYes)];
+        RightButton.tintColor=[UIColor whiteColor];
+        //取消
+        UIBarButtonItem *LeftButton=[[UIBarButtonItem alloc] initWithTitle:@"取消"
+                                                                     style: UIBarButtonItemStyleDone
+                                                                    target: self
+                                                                    action: @selector(cancelNo)];
+        LeftButton.tintColor=[UIColor whiteColor];
+        NSArray *array = [[NSArray alloc] initWithObjects:LeftButton,FixedButton,FixedButton,FixedButton,RightButton, nil];
+        [toolBar setItems: array];
+        [actionSheet addSubview:toolBar];
+        
+        //创建PickerView的信息
+        picker= [[UIPickerView alloc] initWithFrame:CGRectMake(0, 44, WIDTH, 216)];//显示数据面板
+        picker.delegate=self;//显示数据
+        picker.dataSource=self;
+        picker.showsSelectionIndicator = YES;//选中得显示杠
+        picker.backgroundColor=[UIColor whiteColor];
+        //创建PickerView的信息
+        [actionSheet addSubview:picker];//显示数据面板
+        
+    }
+
     
     
 }
@@ -201,7 +235,7 @@
 {
     [ToolLen ShowWaitingView:NO];
     
-    if ([[responseObject objectForKey:@"errorcode"] intValue]==0 && responseObject)
+    if ([[responseObject objectForKey:@"errorcode"] intValue]==0 && responseObject && requestFlag==2)
     {
         //搜索历史
         NSMutableArray *listArray=nil;
@@ -244,7 +278,67 @@
         [self.navigationController pushViewController:illegal animated:YES];
 
     }
+    if ([[responseObject objectForKey:@"errorcode"] intValue]==0 && responseObject && requestFlag==1)
+    {
+        
+         //搜索历史
+        // searchArray=[[NSArray alloc]initWithArray:[document readDataFromDocument:@"SearchList" IsArray:YES]];
+        
+        
+        NSArray *cityArray=[[NSArray alloc]initWithArray:[document readDataFromDocument:@"City" IsArray:YES]];
+        //NSLog(@"city::%@",cityArray);
+        NSMutableArray *listArray=[[NSMutableArray alloc] initWithCapacity:0];
+        
+        for (int i=0; i<[[responseObject objectForKey:@"queryList"] count]; i++)
+        {
+            NSMutableDictionary *searchDic= [NSMutableDictionary dictionaryWithCapacity:0];
+            [searchDic setObject:[[[responseObject objectForKey:@"queryList"] objectAtIndex:i] objectForKey:@"city"] forKey:@"code"];
+            [searchDic setObject:[[[responseObject objectForKey:@"queryList"] objectAtIndex:i] objectForKey:@"engine_no"] forKey:@"engineno"];
+            
+            for (int j=0; j<cityArray.count; j++)
+            {
+                if ([[[[responseObject objectForKey:@"queryList"] objectAtIndex:i] objectForKey:@"city"] isEqualToString:[[cityArray objectAtIndex:j] objectForKey:@"code"]])
+                {
+                    [searchDic setObject:[[cityArray objectAtIndex:j] objectForKey:@"name"] forKey:@"name"];
+                    
+                    break;
+                }
+            }
+            
+            [searchDic setObject:[[[responseObject objectForKey:@"queryList"] objectAtIndex:i] objectForKey:@"hphm"] forKey:@"hphm"];
+            [searchDic setObject:[[[responseObject objectForKey:@"queryList"] objectAtIndex:i] objectForKey:@"classa_no"] forKey:@"classno"];
+            
+            [listArray addObject:searchDic];
+        }
+       
+        
+        searchArray=[[NSArray alloc] initWithArray:listArray];
+        
+        //searchArray=[[NSArray alloc] initWithArray:[responseObject objectForKey:@"queryList"]];
+         if (searchArray.count>0)
+         {
+             [picker reloadAllComponents];
+             
+             if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0) {
+                 
+                 [self presentViewController:alertController animated:YES completion:nil];
+                 
+             }
+             else
+             {
+                 [actionSheet showInView:[self.view  window]];//显示picker
+             }
+         }
+         else
+         {
+             [self alertOnly:@"您当前暂无查询记录"];
+         }
+    }
     else if ([[responseObject objectForKey:@"errorcode"] intValue]==-4 && responseObject)
+    {
+        [self alertOnly:[responseObject objectForKey:@"message"]];
+    }
+    else if ([[responseObject objectForKey:@"errorcode"] intValue]==-3 && responseObject)
     {
         [self alertOnly:[responseObject objectForKey:@"message"]];
     }
@@ -335,19 +429,37 @@
         //NSLog(@"chooseArray::%@",chooseArray);
        // if (chooseArray.count>0)
         
+        
+        /*
         //搜索历史
         searchArray=[[NSArray alloc]initWithArray:[document readDataFromDocument:@"SearchList" IsArray:YES]];
         
         if (searchArray.count>0)
         {
             [picker reloadAllComponents];
-            [actionSheet showInView:[self.view  window]];//显示picker
+           
+            if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0) {
+
+                [self presentViewController:alertController animated:YES completion:nil];
+                
+            }
+            else
+            {
+                 [actionSheet showInView:[self.view  window]];//显示picker
+            }
+            
 
         }
         else
         {
             [self alertOnly:@"您当前暂无查询记录"];
         }
+         */
+        
+        [ToolLen ShowWaitingView:YES];
+        requestFlag=1;
+        [[self JsonFactory]queryHistory:nil action:@"/api/weizhang/queryHistory"];
+        
     }
     else if (sender.tag==2)
     {
@@ -360,12 +472,14 @@
         //NSLog(@"立即查询");
         if ([[userDic objectForKey:@"valid"] intValue]==0)
         {
+            alertPt=0;
             [self alertNoValid];
         }
         else
         {
             [MobClick event:@"illegalButton"];//统计查违章按钮
-            
+            alertPt=1;
+            requestFlag=2;
             if (txt1.text.length==7)
             {
                 if (txt2.text.length>0)
@@ -442,6 +556,20 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (alertPt==0)
+    {
+        if (buttonIndex==1)
+        {
+            //NSLog(@"登录");
+            LoginAndResigerViewController *guide=[[LoginAndResigerViewController alloc] init];
+            guide.hidesBottomBarWhenPushed=YES;
+            [self.navigationController pushViewController:guide animated:YES];
+        }
+    }
 }
 
 @end

@@ -232,6 +232,8 @@
          [temp setObject:cell1.inputTextField.text forKey:@"userpwd"];
          
          [document saveDataToDocument:@"user" fileData:temp];
+         [cell1.inputTextField resignFirstResponder];
+         
          //NSLog(@"temp::%@",temp);
          [self alertOnly:@"密码修改成功"];
      }
@@ -268,10 +270,12 @@
         {
             if ([[userDic objectForKey:@"valid"] intValue]==0)
             {
+                alertPt=0;
                 [self alertNoValid];
             }
             else
             {
+                alertPt=1;
                 //修改密码
                 NSIndexPath *path0=[NSIndexPath indexPathForRow:0 inSection:0];
                 ModifyCell *cell0=(ModifyCell *)[modifyTableView cellForRowAtIndexPath:path0];
@@ -282,7 +286,7 @@
                 ModifyCell *cell1=(ModifyCell *)[modifyTableView cellForRowAtIndexPath:path1];
                 //NSLog(@"cell::%@",cell1.inputTextField.text);
                 
-                NSIndexPath *path2=[NSIndexPath indexPathForRow:1 inSection:0];
+                NSIndexPath *path2=[NSIndexPath indexPathForRow:2 inSection:0];
                 ModifyCell *cell2=(ModifyCell *)[modifyTableView cellForRowAtIndexPath:path2];
                // NSLog(@"cell::%@",cell2.inputTextField.text);
                 
@@ -317,6 +321,20 @@
     // Dispose of any resources that can be recreated.
 }
 
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (alertPt==0)
+    {
+        if (buttonIndex==1)
+        {
+            //NSLog(@"登录");
+            LoginAndResigerViewController *guide=[[LoginAndResigerViewController alloc] init];
+            guide.hidesBottomBarWhenPushed=YES;
+            [self.navigationController pushViewController:guide animated:YES];
+        }
+    }
+}
 
 
 @end

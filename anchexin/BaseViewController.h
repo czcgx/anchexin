@@ -10,16 +10,15 @@
 #import "AFJSONFactory.h"
 #import "ToolLen.h"
 #import "ReadWriteToDocument.h"
-#import "CustomSecondNavViewController.h"
 #import "MJRefresh.h" //上拉或者下提刷新
 
 #import "UIKit+AFNetworking.h"//添加所有网络接口
 
-@interface BaseViewController : UIViewController<JSONDataReturnDelegate,UITextFieldDelegate,MJRefreshBaseViewDelegate>
+@interface BaseViewController : UIViewController<JSONDataReturnDelegate,UITextFieldDelegate,MJRefreshBaseViewDelegate,UIAlertViewDelegate>
 {
     ReadWriteToDocument *document;
     NSDictionary *userDic;
-    NSArray *carArray;
+    NSDictionary *carDic;
     NSDictionary *weatheOilDic;
     
     UIImageView *bg;
@@ -55,6 +54,9 @@
 
 -(UILabel *)drawLine:(CGRect)frame drawColor:(UIColor *)drawColor;
 
+//画横线
+-(UILabel *)drawLinebg:(CGRect)frame lineColor:(UIColor *)lineColor;
+
 
 -(AFJSONFactory *)JsonFactory;
 -(void)JSONSuccess:(id)responseObject;
@@ -65,5 +67,7 @@
 -(UIBarButtonItem *)LeftBarButton;
 
 -(void)alertNoValid;
+
+-(void)refreshAccount;
 
 @end

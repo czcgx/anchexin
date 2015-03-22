@@ -8,6 +8,7 @@
 
 #import "BaseViewController.h"
 #import "ManageCell.h"
+#import "CarInfoViewController.h"//车辆信息
 
 @interface CarManageViewController : BaseViewController<UITableViewDataSource,UITableViewDelegate>
 {
@@ -18,6 +19,8 @@
     int index;
     
     NSString *currentNumber;
+    
+    int alertPt;
 }
 
 @end

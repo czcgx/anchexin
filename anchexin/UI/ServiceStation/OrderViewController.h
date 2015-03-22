@@ -9,6 +9,7 @@
 #import "BaseViewController.h"
 #import "CKCalendarView.h"//日历
 
+
 @interface OrderViewController : BaseViewController<CKCalendarDelegate,UITextFieldDelegate,UIAlertViewDelegate,UIActionSheetDelegate,UITableViewDataSource,UITableViewDelegate>
 {
     UIScrollView *orderScrollView;
@@ -41,8 +42,24 @@
     UIView *pmView;
     
     UITextField *ewaiTextField;
+    
+    UIAlertController *alertController;
+    
+    NSMutableArray *fillInArray;
+    
+    UILabel *carTypeLabel;
+    
+    NSString *carID;
+    
+    int handle;
+    
+    
 }
 
 @property(nonatomic,retain)NSArray *orderArray;
+
 @property(nonatomic,retain)NSString *stationId;
+
+
+
 @end

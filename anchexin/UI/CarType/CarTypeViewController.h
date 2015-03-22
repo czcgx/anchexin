@@ -27,7 +27,4 @@
 
 @property(nonatomic,assign)int state;
 
-
-
-
 @end

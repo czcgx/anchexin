@@ -46,25 +46,57 @@
     [[UINavigationBar appearance] setTitleTextAttributes: [NSDictionary dictionaryWithObjectsAndKeys:kUIColorFromRGB(0x000000), NSForegroundColorAttributeName,[UIFont fontWithName:@"HelveticaNeue-CondensedBlack" size:18.0], NSFontAttributeName, nil]];
      */
 
+    if ([self.navigationBar respondsToSelector:@selector(setBackgroundImage:forBarMetrics:)])
+    {
+        // Set Navigation Bar style
+        CGRect rect=CGRectZero;
+        if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
+        {
+            rect = CGRectMake(0.0f, 0.0f, WIDTH,NavigationBar);
+        }
+        else
+        {
+            rect = CGRectMake(0.0f, 0.0f, WIDTH,44);
+        }
+        
+        // Set Navigation Bar style
+        //CGRect rect = CGRectMake(0.0f, 0.0f, ScreenWidth,64.0f);
+        UIGraphicsBeginImageContext(rect.size);
+        CGContextRef context = UIGraphicsGetCurrentContext();
     
-    // Set Navigation Bar style
-    CGRect rect = CGRectMake(0.0f, 0.0f, ScreenWidth,64.0f);
-    UIGraphicsBeginImageContext(rect.size);
-    CGContextRef context = UIGraphicsGetCurrentContext();
+        CGContextSetFillColorWithColor(context, [[UIColor colorWithWhite:1.0 alpha:0.0f] CGColor]);
+        CGContextFillRect(context, rect);
     
-    CGContextSetFillColorWithColor(context, [[UIColor colorWithWhite: 1.0 alpha:0.0f] CGColor]);
-    CGContextFillRect(context, rect);
+        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
     
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
+        [[UINavigationBar appearance] setBackgroundImage:image forBarMetrics:UIBarMetricsDefault];
+        
+        [[UINavigationBar appearance] setTintColor: [UIColor clearColor]];
+        [[UINavigationBar appearance] setTitleVerticalPositionAdjustment: 0.0f forBarMetrics: UIBarMetricsDefault];//title的位置
+        [[UINavigationBar appearance] setShadowImage:[[UIImage alloc] init]];
     
-    [[UINavigationBar appearance] setBackgroundImage:image forBarMetrics:UIBarMetricsDefault];
-    [[UINavigationBar appearance] setTintColor: [UIColor clearColor]];
-    [[UINavigationBar appearance] setTitleVerticalPositionAdjustment: 0.0f forBarMetrics: UIBarMetricsDefault];//title的位置
-    [[UINavigationBar appearance] setShadowImage:[[UIImage alloc] init]];
-    
-    ;    //设置文本的阴影色彩和透明度。
-    [[UINavigationBar appearance] setTitleTextAttributes: [NSDictionary dictionaryWithObjectsAndKeys:kUIColorFromRGB(0xFFFFFF), NSForegroundColorAttributeName,  [UIColor colorWithWhite:0.1f alpha:0.5f], UITextAttributeTextShadowColor,[NSValue valueWithUIOffset:UIOffsetMake(0, 1.0)], UITextAttributeTextShadowOffset, [UIFont systemFontOfSize:20.0], UITextAttributeFont,nil]];//title的颜色
+        if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
+        {
+            //self.navigationBar.translucent = NO;
+            //self.edgesForExtendedLayout = UIRectEdgeNone; //视图控制器，四条边不指定
+            
+            //设置文本的阴影色彩和透明度。
+            [[UINavigationBar appearance] setTitleTextAttributes: [NSDictionary dictionaryWithObjectsAndKeys:kUIColorFromRGB(0xFFFFFF), NSForegroundColorAttributeName, [UIFont systemFontOfSize:20.0], NSFontAttributeName,nil]];//title的颜色
+            
+        }
+        else
+        {
+            [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
+            
+            [[UINavigationBar appearance] setTitleTextAttributes:@{
+                                                                   NSForegroundColorAttributeName : [UIColor blackColor]}];
+            
+            
+            
+        }
+        
+    }
     
     
     
@@ -104,7 +136,7 @@
     
     UIImage *image=IMAGE(@"thebackbuttonbg");//返回按钮的背景
     UIButton *btn=[UIButton buttonWithType:UIButtonTypeCustom];
-    btn.frame=CGRectMake(0, 10, 20, 20);
+    btn.frame=CGRectMake(0, 10, 25, 25);
     [btn setBackgroundImage:image forState:UIControlStateNormal];
     [btn addTarget:self action:@selector(popself) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *backItem = [[UIBarButtonItem alloc] initWithCustomView:btn];

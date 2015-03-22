@@ -26,12 +26,22 @@
 #import "APService.h"//极光推送
 
 #import "MobClick.h"
+#import "UMSocial.h"//友盟分享
 #define UMENG_APPKEY @"541a4395fd98c5af4902f89a"//友盟统计APPKey
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate,UITabBarControllerDelegate,CLLocationManagerDelegate>
+#import "UMSocialWechatHandler.h"//微信分享
+#import "UMSocialQQHandler.h"//qq空间分享
+#import "UMSocialSinaHandler.h"//新浪分享
+
+#import "BMapKit.h"//引入百度地图
+
+#import "WXApi.h"
+
+@interface AppDelegate : UIResponder <UIApplicationDelegate,UITabBarControllerDelegate,CLLocationManagerDelegate,BMKGeneralDelegate,WXApiDelegate>
 {
     
     CLLocationManager *locManager;//定位当前位置参数
+    BMKMapManager * _mapManager;
     
     //PPRevealSideViewController *revealSideViewController;
     

@@ -61,7 +61,7 @@
         {
             if (upscore>0)
             {
-                [[self JsonFactory]set_setRepairStationComment:stationId userid:[userDic  objectForKey:@"userid"] content:commentTextView.text satisfaction:[NSString stringWithFormat:@"%d",upscore] action:@"setRepairStationComment"];
+                [[self JsonFactory]set_setRepairStationComment:stationId userid:[userDic  objectForKey:@"id"] content:commentTextView.text satisfaction:[NSString stringWithFormat:@"%d",upscore] action:@"setStationComment"];
             }
             else
             {

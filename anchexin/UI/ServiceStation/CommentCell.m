@@ -9,8 +9,11 @@
 #import "CommentCell.h"
 
 @implementation CommentCell
-@synthesize commentLabel;
-@synthesize img;
+@synthesize commentDateLabel;
+@synthesize commentNameLabel;
+@synthesize commentContentLabel;
+@synthesize commentView;
+
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {

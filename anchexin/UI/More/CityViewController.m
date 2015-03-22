@@ -40,8 +40,12 @@
     
     cityTableView=[[UITableView alloc]initWithFrame:CGRectMake(0,0, WIDTH, mainView.frame.size.height)];
     cityTableView.sectionIndexColor=[UIColor whiteColor];
-    cityTableView.sectionIndexBackgroundColor=[UIColor clearColor];
-    cityTableView.sectionIndexTrackingBackgroundColor = [UIColor clearColor];
+    if ([[UIDevice currentDevice].systemVersion floatValue] >= 7.0)
+    {
+        cityTableView.sectionIndexBackgroundColor=[UIColor clearColor];
+        cityTableView.sectionIndexTrackingBackgroundColor = [UIColor clearColor];
+    }
+    
     
     /*
     //--快速索引

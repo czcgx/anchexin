@@ -34,35 +34,39 @@
     mainView.backgroundColor=kUIColorFromRGB(Commonbg);
     
     NSInteger png=[[NSUserDefaults standardUserDefaults]integerForKey:@"skin_Flag"];
-    for (int i=0; i<3; i++)
+    for (int i=0; i<2; i++)
     {
-        UIView *bgView=[[UIView alloc] initWithFrame:CGRectMake(20+100*i, 20, 80, 80)];
-        bgView.tag=i;
-        bgView.backgroundColor=[UIColor clearColor];
-        
-        [bgView addSubview:[self customImageView:bgView.bounds image:IMAGE(@"skinbg")]];
-        
-        NSString *icon=[NSString stringWithFormat:@"bg_%d_thumb",i+1];
-        [bgView addSubview:[self customImageView:CGRectMake(5, 5, 70, 70) image:IMAGE(icon)]];
-        
-        UIImageView *img=[self customImageView:CGRectMake(55, 10, 15, 15) image:IMAGE(@"skinchoose")];
-        img.tag=i+100;
-        [bgView addSubview:img];
-        if (i==png)
+        for (int j=0; j<3; j++)
         {
-            img.hidden=NO;
+            
+                UIView *bgView=[[UIView alloc] initWithFrame:CGRectMake(20+100*j, 20+100*i, 80, 80)];
+                bgView.tag=3*i+j;
+                bgView.backgroundColor=[UIColor clearColor];
+                
+                [bgView addSubview:[self customImageView:bgView.bounds image:IMAGE(@"skinbg")]];
+                
+                NSString *icon=[NSString stringWithFormat:@"bg_%d_thumb",3*i+j+1];
+                [bgView addSubview:[self customImageView:CGRectMake(5, 5, 70, 70) image:IMAGE(icon)]];
+                
+                UIImageView *img=[self customImageView:CGRectMake(55, 10, 15, 15) image:IMAGE(@"skinchoose")];
+                img.tag=3*i+j+100;
+                [bgView addSubview:img];
+                if (3*i+j==png)
+                {
+                    img.hidden=NO;
+                }
+                else
+                {
+                    img.hidden=YES;
+                }
+                
+                [bgView addSubview:[self customButton:bgView.bounds tag:3*i+j title:nil state:0 image:nil selectImage:nil color:nil enable:YES]];
+                
+                [mainView addSubview:bgView];
+            
         }
-        else
-        {
-            img.hidden=YES;
-        }
-        
-        [bgView addSubview:[self customButton:bgView.bounds tag:i title:nil state:0 image:nil selectImage:nil color:nil enable:YES]];
-        
-        [mainView addSubview:bgView];
-        
     }
-
+  
     [self.view addSubview:mainView];
     
 }

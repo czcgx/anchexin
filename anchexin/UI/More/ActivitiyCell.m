@@ -10,11 +10,11 @@
 
 @implementation ActivitiyCell
 @synthesize shopImageView;
-@synthesize shopNameLabel;
-@synthesize carNameLabel;
+
 @synthesize activityNameLabel;
-@synthesize timeLabel;
-@synthesize isRequest;
+@synthesize activitydesLabel;
+@synthesize activityDiscountLabel;
+
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {

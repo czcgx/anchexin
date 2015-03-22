@@ -50,7 +50,8 @@
     if (responseObject && [[responseObject objectForKey:@"errorcode"] intValue]==0)
     {
         UIImageView *imgView=[[UIImageView alloc] initWithFrame:CGRectMake(10, 10, 300, 150)];
-        [imgView setImageWithURL:[NSURL URLWithString:[responseObject objectForKey:@"image"]] placeholderImage:nil];
+        //[imgView sd:[NSURL URLWithString:[responseObject objectForKey:@"image"]] placeholderImage:nil];
+        [imgView sd_setImageWithURL:[NSURL URLWithString:[responseObject objectForKey:@"image"]] placeholderImage:nil];
         
         [imgScrollView addSubview:imgView];
     }
@@ -61,15 +62,5 @@
     // Dispose of any resources that can be recreated.
 }
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

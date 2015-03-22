@@ -9,7 +9,8 @@
 #import "AFJSONFactory.h"
 
 
-static NSString * const AFBaseURLString = @"http://apiv200.anchexin.com/";
+//static NSString * const AFBaseURLString = @"http://apiv200.anchexin.com/";
+//static NSString * const AFBaseURLString = @"http://apiv220.anchexin.com/";
 
 @implementation AFJSONFactory
 @synthesize delegate;
@@ -23,39 +24,93 @@ static NSString * const AFBaseURLString = @"http://apiv200.anchexin.com/";
     return escapedUrlString;
 }
 
+
+- (void)reach
+{
+    /**
+     AFNetworkReachabilityStatusUnknown          = -1,  // 未知
+     AFNetworkReachabilityStatusNotReachable     = 0,   // 无连接
+     AFNetworkReachabilityStatusReachableViaWWAN = 1,   // 3G 花钱
+     AFNetworkReachabilityStatusReachableViaWiFi = 2,   // 局域网络,不花钱
+     */
+    
+}
 //类
 -(void)getJSONDataByParam:(NSDictionary *)params action:(NSString *)action
 {
-    //NSLog(@"jsonParam::%@",params);
+    NSLog(@"jsonParam::%@",params);
+    
+    // 如果要检测网络状态的变化,必须用检测管理器的单例的startMonitoring
+    [AFNetworkActivityIndicatorManager sharedManager].enabled = YES;
+    [[AFNetworkReachabilityManager sharedManager] startMonitoring];
+    // 检测网络连接的单例,网络变化时的回调方法
+    [[AFNetworkReachabilityManager sharedManager] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+        
+        //NSLog(@"%ld", status);
+        if (status==1 || status==2)
+        {
+            //1.管理器
+            AFHTTPRequestOperationManager *manager= [AFHTTPRequestOperationManager manager];
+            //2.0 设置请求格式
+            manager.requestSerializer=[AFJSONRequestSerializer serializer];
 
-    //1.管理器
-    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
-    
-    //2.0 设置请求格式
-    manager.requestSerializer=[AFJSONRequestSerializer serializer];
-    //2.1 设置返回数据类型
-    manager.responseSerializer = [AFJSONResponseSerializer serializer]; //先实例化一下
-    
-    //3.发起请求
-    [manager POST:[NSString stringWithFormat:@"%@%@",AFBaseURLString,action]
-             parameters:params
-             success: ^(AFHTTPRequestOperation *operation, id responseObject)
-            {
-               //NSLog(@"success=>%@", responseObject);
-                if ([delegate respondsToSelector:@selector(JSONSuccess:)])
-                {
-                    [delegate JSONSuccess:responseObject];
-                }
+            //manager.responseSerializer.acceptableContentTypes = [NSSet setWithObject:@"text/html"];
+            
+            //2.1 设置返回数据类型
+            manager.responseSerializer = [AFJSONResponseSerializer serializer]; //先实例化一下
+            
+            @try{
+                
+                //3.发起请求
+                [manager POST:[NSString stringWithFormat:@"%@%@",AFBaseURLString,action]
+                   parameters:params
+                      success: ^(AFHTTPRequestOperation *operation, id responseObject)
+                 {
+                     //NSLog(@"success=>%@", responseObject);
+                     
+                     if ([delegate respondsToSelector:@selector(JSONSuccess:)])
+                     {
+                         //[[AFNetworkReachabilityManager sharedManager] stopMonitoring];
+                         [delegate JSONSuccess:responseObject];
+                     }
+                 }
+                      failure: ^(AFHTTPRequestOperation *operation, NSError *error)
+                 {
+                     //NSLog(@"error=>%@", error);
+                     
+                     if ([delegate respondsToSelector:@selector(JSONError:)])
+                     {
+                         [[AFNetworkReachabilityManager sharedManager] stopMonitoring];
+                         
+                         [delegate JSONError:error];
+                         
+                     }
+                 }];
             }
-            failure: ^(AFHTTPRequestOperation *operation, NSError *error)
+            @catch(NSException *exception)
             {
-                //NSLog(@"error=>%@", error);
-                if ([delegate respondsToSelector:@selector(JSONError:)])
-                {
-                    [delegate JSONError:error];
-                    
-                }
-            }];
+                //NSLog(@"exception:%@", exception);
+            }
+            @finally {
+                
+            }
+
+        }
+        else
+        {
+            
+            if ([delegate respondsToSelector:@selector(JSONError:)])
+            {
+                [[AFNetworkReachabilityManager sharedManager] stopMonitoring];
+                
+                [delegate JSONError:nil];
+                
+            }
+            
+        }
+        
+    }];
+    
     
 }
 
@@ -124,8 +179,8 @@ static NSString * const AFBaseURLString = @"http://apiv200.anchexin.com/";
     
 }
 
-//根据排序获取相关地区维修店列表
--(void)get_getRepairStationOrderList:(NSString *)currentpage city:(NSString *)city area:(NSString *)area order:(NSString *)order lng:(NSString *)lng lat:(NSString *)lat action:(NSString *)action
+//根据排序获取相关地区维修店列表--check
+-(void)get_getRepairStationOrderList:(NSString *)currentpage city:(NSString *)city area:(NSString *)area order:(NSString *)order lng:(NSString *)lng lat:(NSString *)lat state:(int)state action:(NSString *)action
 {
     NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
     [bodyDic setObject:currentpage forKey:@"currentpage"];
@@ -134,6 +189,18 @@ static NSString * const AFBaseURLString = @"http://apiv200.anchexin.com/";
     [bodyDic setObject:order forKey:@"order"];
     [bodyDic setObject:lng forKey:@"lng"];
     [bodyDic setObject:lat forKey:@"lat"];
+    
+    if (state==1)
+    {
+        [bodyDic setObject:[AppDelegate setGlobal].uid  forKey:@"user"];
+        [bodyDic setObject:[AppDelegate setGlobal].token forKey:@"token"];
+    }
+    else
+    {
+        [bodyDic setObject:@""  forKey:@"user"];
+        [bodyDic setObject:@"" forKey:@"token"];
+    }
+    
     
     [self getJSONDataByParam:bodyDic action:action];
 }
@@ -174,7 +241,7 @@ static NSString * const AFBaseURLString = @"http://apiv200.anchexin.com/";
 
 #pragma -
 #pragma -车型
-//获取车型品牌列表
+//获取车型品牌列表--check
 -(void)get_getCarBrandList:(NSString *)action
 {
     NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
@@ -259,12 +326,12 @@ static NSString * const AFBaseURLString = @"http://apiv200.anchexin.com/";
 #pragma -
 #pragma -账户
 //登录接口
--(void)get_login:(NSString *)loginname loginpwd:(NSString *)loginpwd action:(NSString *)action
+-(void)get_login:(NSString *)mobile secret:(NSString *)secret action:(NSString *)action
 {
     NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
-    [bodyDic setObject:loginname forKey:@"username"];
-    [bodyDic setObject:loginpwd forKey:@"userpwd"];
-    [bodyDic setObject:@"" forKey:@"city"];
+    [bodyDic setObject:mobile forKey:@"mobile"];
+    [bodyDic setObject:secret forKey:@"secret"];
+    [bodyDic setObject:@"system" forKey:@"source"];
 
     [self getJSONDataByParam:bodyDic action:action];
     
@@ -273,7 +340,6 @@ static NSString * const AFBaseURLString = @"http://apiv200.anchexin.com/";
 //测试账户
 -(void)test:(NSString *)param1 action:(NSString *)action
 {
-    
     [self getJSONDataByParam:nil action:action];
 }
 
@@ -349,7 +415,7 @@ static NSString * const AFBaseURLString = @"http://apiv200.anchexin.com/";
     
 }
 
-//获取验证码
+//获取验证码－check
 -(void)getSecret:(NSString *)mobile action:(NSString *)action
 {
     NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
@@ -390,6 +456,9 @@ static NSString * const AFBaseURLString = @"http://apiv200.anchexin.com/";
     [bodyDic setObject:[AppDelegate setGlobal].token forKey:@"token"];//获取token
     [bodyDic setObject:[AppDelegate setGlobal].uid forKey:@"user"];//获取userid
     
+    [bodyDic setObject:@"0" forKey:@"page"];
+    [bodyDic setObject:@"20" forKey:@"pageSize"];
+    
     [self getJSONDataByParam:bodyDic action:action];
     
 }
@@ -404,7 +473,7 @@ static NSString * const AFBaseURLString = @"http://apiv200.anchexin.com/";
     
 }
 
-
+/*
 //获取优惠券列表
 -(void)searchActivity:(NSString *)city item:(NSString *)item action:(NSString *)action
 {
@@ -426,6 +495,7 @@ static NSString * const AFBaseURLString = @"http://apiv200.anchexin.com/";
     
     [self getJSONDataByParam:bodyDic action:action];
 }
+*/
 
 //修改绑定手机
 -(void)set_setMobileNumber:(NSString *)mobilenumber action:(NSString *)action
@@ -499,6 +569,9 @@ static NSString * const AFBaseURLString = @"http://apiv200.anchexin.com/";
     NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
     [bodyDic setObject:station forKey:@"station"];
     
+    [bodyDic setObject:[AppDelegate setGlobal].token forKey:@"token"];//获取token
+    [bodyDic setObject:[AppDelegate setGlobal].uid forKey:@"user"];//获取userid
+    
     [self getJSONDataByParam:bodyDic action:action];
     
 }
@@ -507,7 +580,7 @@ static NSString * const AFBaseURLString = @"http://apiv200.anchexin.com/";
 -(void)get_getRepairStationCommentList:(NSString *)stationid currentpage:(NSString *)currentpage action:(NSString *)action
 {
     NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
-    [bodyDic setObject:stationid forKey:@"stationid"];
+    [bodyDic setObject:stationid forKey:@"station"];
     [bodyDic setObject:currentpage forKey:@"currentpage"];
     [bodyDic setObject:[AppDelegate setGlobal].token forKey:@"token"];//获取token
     [bodyDic setObject:[AppDelegate setGlobal].uid forKey:@"userid"];//获取userid
@@ -545,16 +618,17 @@ static NSString * const AFBaseURLString = @"http://apiv200.anchexin.com/";
 
 
 //提交预约
--(void)addRequest:(NSString *)contact mobile:(NSString *)mobile  startTime:(NSString *)startTime serviceIds:(NSString *)serviceIds station:(NSString *)station car:(NSString *)car description:(NSString *)description token:(NSString *)token action:(NSString *)action
+-(void)addRequest:(NSString *)contact mobile:(NSString *)mobile  startTime:(NSString *)startTime serviceList:(NSString *)serviceList station:(NSString *)station car:(NSString *)car description:(NSString *)description token:(NSString *)token action:(NSString *)action
 {
     NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
     [bodyDic setObject:contact forKey:@"contact"];
     [bodyDic setObject:mobile forKey:@"mobile"];
     [bodyDic setObject:startTime forKey:@"startTime"];
-    [bodyDic setObject:serviceIds forKey:@"serviceIds"];
+    [bodyDic setObject:serviceList forKey:@"serviceList"];
     [bodyDic setObject:station forKey:@"station"];
     [bodyDic setObject:car forKey:@"car"];
     [bodyDic setObject:description forKey:@"description"];
+    
     [bodyDic setObject:[AppDelegate setGlobal].token forKey:@"token"];//获取token
     [bodyDic setObject:[AppDelegate setGlobal].uid forKey:@"user"];//获取userid
     
@@ -583,8 +657,8 @@ static NSString * const AFBaseURLString = @"http://apiv200.anchexin.com/";
 -(void)set_setRepairStationComment:(NSString *)stationid userid:(NSString *)userid content:(NSString *)content satisfaction:(NSString *)satisfaction action:(NSString *)action
 {
     NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
-    [bodyDic setObject:stationid forKey:@"stationid"];
-    [bodyDic setObject:userid forKey:@"userid"];
+    [bodyDic setObject:stationid forKey:@"station"];
+    [bodyDic setObject:userid forKey:@"user"];
     [bodyDic setObject:content forKey:@"content"];
     [bodyDic setObject:satisfaction forKey:@"satisfaction"];
     [bodyDic setObject:[AppDelegate setGlobal].token forKey:@"token"];//获取token
@@ -639,4 +713,207 @@ static NSString * const AFBaseURLString = @"http://apiv200.anchexin.com/";
   
     [self getJSONDataByParam:bodyDic action:action];
 }
+
+//意见反馈
+-(void)addUserAdvice:(NSString *)content action:(NSString *)action
+{
+    NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    [bodyDic setObject:content forKey:@"content"];
+    [bodyDic setObject:[AppDelegate setGlobal].token forKey:@"token"];//获取token
+    [bodyDic setObject:[AppDelegate setGlobal].uid forKey:@"user"];//获取userid
+    
+    [self getJSONDataByParam:bodyDic action:action];
+    
+}
+
+
+//是否收藏店铺
+-(void)collectStation:(NSString *)op station:(NSString *)station action:(NSString *)action
+{
+    NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    [bodyDic setObject:op forKey:@"op"];
+    [bodyDic setObject:station forKey:@"station"];
+    
+    [bodyDic setObject:[AppDelegate setGlobal].token forKey:@"token"];//获取token
+    [bodyDic setObject:[AppDelegate setGlobal].uid forKey:@"user"];//获取userid
+    
+    [self getJSONDataByParam:bodyDic action:action];
+}
+
+
+//获取收藏的维修站列表
+-(void)getUserCollectionList:(NSString *)page pageSize:(NSString *)pageSize action:(NSString *)action
+{
+    NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    [bodyDic setObject:page forKey:@"page"];
+    [bodyDic setObject:pageSize forKey:@"pageSize"];
+    
+    [bodyDic setObject:[AppDelegate setGlobal].token forKey:@"token"];//获取token
+    [bodyDic setObject:[AppDelegate setGlobal].uid forKey:@"user"];//获取userid
+    
+    //[bodyDic setObject:@"8bb5b6241b4137421059276bad607509" forKey:@"token"];//获取token
+    //[bodyDic setObject:@"41" forKey:@"user"];//获取userid
+    
+    [self getJSONDataByParam:bodyDic action:action];
+    
+}
+
+//获取所有活动接口（新增）
+-(void)getActivityList:(NSString *)page pageSize:(NSString *)pageSize lng:(NSString *)lng lat:(NSString *)lat action:(NSString *)action
+{
+    NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    [bodyDic setObject:page forKey:@"page"];
+    [bodyDic setObject:pageSize forKey:@"pageSize"];
+    [bodyDic setObject:lng forKey:@"lng"];
+    [bodyDic setObject:lat forKey:@"lat"];
+    
+    [bodyDic setObject:[AppDelegate setGlobal].token forKey:@"token"];//获取token
+    [bodyDic setObject:[AppDelegate setGlobal].uid forKey:@"user"];//获取userid
+    
+    //[bodyDic setObject:@"8bb5b6241b4137421059276bad607509" forKey:@"token"];//获取token
+    //[bodyDic setObject:@"41" forKey:@"user"];//获取userid
+    
+    [self getJSONDataByParam:bodyDic action:action];
+}
+
+//获取搜索活动接口（新增）
+-(void)searchActivityList:(NSString *)page pageSize:(NSString *)pageSize title:(NSString *)title action:(NSString *)action
+{
+    NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    [bodyDic setObject:page forKey:@"page"];
+    [bodyDic setObject:pageSize forKey:@"pageSize"];
+    [bodyDic setObject:title forKey:@"title"];
+    
+    [bodyDic setObject:[AppDelegate setGlobal].token forKey:@"token"];//获取token
+    [bodyDic setObject:[AppDelegate setGlobal].uid forKey:@"user"];//获取userid
+    
+    //[bodyDic setObject:@"8bb5b6241b4137421059276bad607509" forKey:@"token"];//获取token
+    //[bodyDic setObject:@"41" forKey:@"user"];//获取userid
+    
+    [self getJSONDataByParam:bodyDic action:action];
+}
+
+/*
+//活动详情接口
+-(void)getActivityDetail:(NSString *)activity action:(NSString *)action
+{
+    [bodyDic setObject:[AppDelegate setGlobal].uid forKey:@"user"];//获取userid
+    
+    //[bodyDic setObject:@"8bb5b6241b4137421059276bad607509" forKey:@"token"];//获取token
+    //[bodyDic setObject:@"41" forKey:@"user"];//获取userid
+    
+    [self getJSONDataByParam:bodyDic action:action];
+}
+*/
+
+//查询所有认证点列表
+-(void)getListByLocation:(NSString *)lat lng:(NSString *)lng action:(NSString *)action
+{
+    NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    [bodyDic setObject:lat forKey:@"lat"];
+    [bodyDic setObject:lng forKey:@"lng"];
+    
+    [self getJSONDataByParam:bodyDic action:action];
+}
+
+//获取用户领取的活动
+-(void)getActivityListHaveReceived:(NSString *)page pageSize:(NSString *)pageSize action:(NSString *)action
+{
+    NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    [bodyDic setObject:page forKey:@"page"];
+    [bodyDic setObject:pageSize forKey:@"pageSize"];
+    
+    [bodyDic setObject:[AppDelegate setGlobal].token forKey:@"token"];//获取token
+    [bodyDic setObject:[AppDelegate setGlobal].uid forKey:@"user"];//获取userid
+    
+    [self getJSONDataByParam:bodyDic action:action];
+}
+
+//根据标签搜索活动
+-(void)getActivityListByTag:(NSString *)page pageSize:(NSString *)pageSize tag:(NSString *)tag lng:(NSString *)lng lat:(NSString *)lat action:(NSString *)action
+{
+    NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    [bodyDic setObject:page forKey:@"page"];
+    [bodyDic setObject:pageSize forKey:@"pageSize"];
+    [bodyDic setObject:tag forKey:@"tag"];
+    [bodyDic setObject:lng forKey:@"lng"];
+    [bodyDic setObject:lat forKey:@"lat"];
+    
+    [bodyDic setObject:[AppDelegate setGlobal].token forKey:@"token"];//获取token
+    [bodyDic setObject:[AppDelegate setGlobal].uid forKey:@"user"];//获取userid
+    
+    [self getJSONDataByParam:bodyDic action:action];
+}
+
+//获取已支付列表
+
+-(void)getOrderList:(NSString *)payStatusList page:(NSString *)page pageSize:(NSString *)pageSize action:(NSString *)action
+{
+    NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    [bodyDic setObject:payStatusList forKey:@"payStatusList"];
+    [bodyDic setObject:page forKey:@"page"];
+    [bodyDic setObject:pageSize forKey:@"pageSize"];
+    
+    [bodyDic setObject:[AppDelegate setGlobal].token forKey:@"token"];//获取token
+    [bodyDic setObject:[AppDelegate setGlobal].uid forKey:@"user"];//获取userid
+    
+    [self getJSONDataByParam:bodyDic action:action];
+}
+
+
+//确认支付订单
+-(void)addOrder:(NSString *)station serviceList:(NSString *)serviceList paySource:(NSString *)paySource action:(NSString *)action
+{
+    NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    [bodyDic setObject:station forKey:@"station"];
+    [bodyDic setObject:serviceList forKey:@"serviceList"];
+    [bodyDic setObject:paySource forKey:@"paySource"];
+    
+    [bodyDic setObject:[AppDelegate setGlobal].token forKey:@"token"];//获取token
+    [bodyDic setObject:[AppDelegate setGlobal].uid forKey:@"user"];//获取userid
+    
+    [self getJSONDataByParam:bodyDic action:action];
+}
+
+
+//获取维修站下的活动
+-(void)getActivityListByStation:(NSString *)page pageSize:(NSString *)pageSize station:(NSString *)station action:(NSString *)action
+{
+    NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    [bodyDic setObject:page forKey:@"page"];
+    [bodyDic setObject:pageSize forKey:@"pageSize"];
+    [bodyDic setObject:station forKey:@"station"];
+    
+    [bodyDic setObject:[AppDelegate setGlobal].token forKey:@"token"];//获取token
+    [bodyDic setObject:[AppDelegate setGlobal].uid forKey:@"user"];//获取userid
+    
+    [self getJSONDataByParam:bodyDic action:action];
+    
+    
+}
+
+//违章查询历史接口
+-(void)queryHistory:(NSString *)user action:(NSString *)action
+{
+    NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    
+    [bodyDic setObject:[AppDelegate setGlobal].token forKey:@"token"];//获取token
+    [bodyDic setObject:[AppDelegate setGlobal].uid forKey:@"user"];//获取userid
+    
+    [self getJSONDataByParam:bodyDic action:action];
+
+}
+
+//从活动中下订单
+-(void)addOrderByActivity:(NSString *)activity paySource:(NSString *)paySource action:(NSString *)action
+{
+    NSMutableDictionary *bodyDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    [bodyDic setObject:activity forKey:@"activity"];
+    [bodyDic setObject:paySource forKey:@"paySource"];
+    [bodyDic setObject:[AppDelegate setGlobal].token forKey:@"token"];//获取token
+    [bodyDic setObject:[AppDelegate setGlobal].uid forKey:@"user"];//获取userid
+    
+    [self getJSONDataByParam:bodyDic action:action];
+}
+
 @end

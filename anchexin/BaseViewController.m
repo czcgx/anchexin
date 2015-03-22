@@ -126,7 +126,6 @@
         [customButton setBackgroundImage:selectImage forState:UIControlStateHighlighted];
     }
     
-    
     customButton.tag=tag;
     customButton.enabled=enable;
     [customButton addTarget:self action:@selector(customEvent:) forControlEvents:UIControlEventTouchUpInside];
@@ -201,13 +200,25 @@
 }
 
 
+//画横线
+-(UILabel *)drawLinebg:(CGRect)frame lineColor:(UIColor *)lineColor
+{
+    UILabel *lineLabel=[[UILabel alloc] initWithFrame:frame];
+    lineLabel.backgroundColor=lineColor;
+    
+    return lineLabel;
+}
+
+
 -(void)refreshAccount
 {
-    
     document= [[ReadWriteToDocument alloc]init];
     document.folderName=@"anchexin";
+    
+    
     userDic=[document readDataFromDocument:@"user" IsArray:NO];
-    carArray=[document readDataFromDocument:@"car" IsArray:YES];
+    carDic=[document readDataFromDocument:@"car" IsArray:NO];
+    
     weatheOilDic=[document readDataFromDocument:@"weatherOil" IsArray:NO];
     
 }
@@ -217,6 +228,8 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
    
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:NO];
+    
     //设置通知
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changeBgImg) name:@"changeBgImg" object:nil];
     
@@ -227,7 +240,8 @@
     document= [[ReadWriteToDocument alloc]init];
     document.folderName=@"anchexin";
     userDic=[document readDataFromDocument:@"user" IsArray:NO];
-    carArray=[document readDataFromDocument:@"car" IsArray:YES];
+    
+    carDic=[document readDataFromDocument:@"car" IsArray:NO];
     weatheOilDic=[document readDataFromDocument:@"weatherOil" IsArray:NO];
     
 }
@@ -257,7 +271,7 @@
 {
     [ToolLen ShowWaitingView:NO];
     //NSLog(@"returnError:%@",error);
-    [self alertOnly:@"服务器失误"];
+    [self alertOnly:@"由于您当前网络不稳定,请查看网络,稍后重新刷新..."];
   
     
 }
@@ -279,11 +293,22 @@
                                         otherButtonTitles:nil];
     
     [alert show];
+    
+    
 }
 
 -(void)alertNoValid
 {
-    [self alertOnly:@"您当前是体验账户,如需操作,请注销后注册或登录"];
+    UIAlertView *alert=[[UIAlertView alloc] initWithTitle:nil
+                                                  message:@"您当前是体验账户,如需操作,请注册或登录"
+                                                 delegate:self
+                                        cancelButtonTitle:@"取消"
+                                        otherButtonTitles:@"注册/登录",nil];
+    
+    [alert show];
+
 }
+
+
 
 @end

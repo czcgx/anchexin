@@ -21,6 +21,7 @@
 
 @interface AFJSONFactory : NSObject
 {
+    
     id<JSONDataReturnDelegate> delegate;
     
 }
@@ -46,6 +47,7 @@
 //根据区域获取相关地区维修店列表
 -(void)get_getRepairStationList:(NSString *)currentpage city:(NSString *)city area:(NSString *)area type:(NSString *)type lng:(NSString *)lng lat:(NSString *)lat action:(NSString *)action;
 
+
 //获取省列表
 -(void)getCityList:(NSString *)action;
 
@@ -53,7 +55,7 @@
 -(void)getAreaList:(NSString *)city action:(NSString *)action;
 
 //根据排序获取相关地区维修店列表
--(void)get_getRepairStationOrderList:(NSString *)currentpage city:(NSString *)city area:(NSString *)area order:(NSString *)order lng:(NSString *)lng lat:(NSString *)lat action:(NSString *)action;
+-(void)get_getRepairStationOrderList:(NSString *)currentpage city:(NSString *)city area:(NSString *)area order:(NSString *)order lng:(NSString *)lng lat:(NSString *)lat state:(int)state action:(NSString *)action;
 
 //搜索维修站
 -(void)getRepairStationListBySearch:(NSString *)currentpage name:(NSString *)name lat:(NSString *)lat lng:(NSString *)lng action:(NSString *)action;
@@ -89,7 +91,7 @@
 #pragma -
 #pragma -账户
 //登录接口
--(void)get_login:(NSString *)loginname loginpwd:(NSString *)loginpwd action:(NSString *)action;
+-(void)get_login:(NSString *)mobile secret:(NSString *)secret action:(NSString *)action;
 
 
 //获取待办服务信息
@@ -126,10 +128,10 @@
 -(void)getActivity:(NSString *)action;
 
 //获取优惠券列表
--(void)searchActivity:(NSString *)city item:(NSString *)item action:(NSString *)action;
+//-(void)searchActivity:(NSString *)city item:(NSString *)item action:(NSString *)action;
 
 //获取优惠活动详细页面
--(void)getActivityDetail:(NSString *)activity action:(NSString *)action;
+//-(void)getActivityDetail:(NSString *)activity action:(NSString *)action;
 
 //修改绑定手机
 -(void)set_setMobileNumber:(NSString *)mobilenumber action:(NSString *)action;
@@ -156,7 +158,7 @@
 -(void)get_healthCheck:(NSString *)car action:(NSString *)action;
 
 //提交预约
--(void)addRequest:(NSString *)contact mobile:(NSString *)mobile  startTime:(NSString *)startTime serviceIds:(NSString *)serviceIds station:(NSString *)station car:(NSString *)car description:(NSString *)description token:(NSString *)token action:(NSString *)action;
+-(void)addRequest:(NSString *)contact mobile:(NSString *)mobile  startTime:(NSString *)startTime serviceList:(NSString *)serviceList station:(NSString *)station car:(NSString *)car description:(NSString *)description token:(NSString *)token action:(NSString *)action;
 
 //获取维修站图片列表
 -(void)get_getRepairStationImage:(NSString *)stationid action:(NSString *)action;
@@ -177,5 +179,45 @@
 
 //忘记密码接口
 -(void)forgetPassword:(NSString *)mobile secret:(NSString *)secret action:(NSString *)action;
+
+//意见反馈
+-(void)addUserAdvice:(NSString *)content action:(NSString *)action;
+
+//是否收藏店铺
+-(void)collectStation:(NSString *)op station:(NSString *)station action:(NSString *)action;
+
+
+//获取收藏的维修站列表
+-(void)getUserCollectionList:(NSString *)page pageSize:(NSString *)pageSize action:(NSString *)action;
+
+//获取所有活动接口（新增）
+-(void)getActivityList:(NSString *)page pageSize:(NSString *)pageSize lng:(NSString *)lng lat:(NSString *)lat action:(NSString *)action;
+
+-(void)searchActivityList:(NSString *)page pageSize:(NSString *)pageSize title:(NSString *)title action:(NSString *)action;
+
+
+//查询所有认证点列表
+-(void)getListByLocation:(NSString *)lat lng:(NSString *)lng action:(NSString *)action;
+
+//获取用户领取的活动
+-(void)getActivityListHaveReceived:(NSString *)page pageSize:(NSString *)pageSize action:(NSString *)action;
+
+//根据标签搜索活动
+-(void)getActivityListByTag:(NSString *)page pageSize:(NSString *)pageSize tag:(NSString *)tag lng:(NSString *)lng lat:(NSString *)lat action:(NSString *)action;
+
+//确认支付订单
+-(void)addOrder:(NSString *)station serviceList:(NSString *)serviceList paySource:(NSString *)paySource action:(NSString *)action;
+
+//获取已支付列表
+-(void)getOrderList:(NSString *)payStatusList page:(NSString *)page pageSize:(NSString *)pageSize action:(NSString *)action;
+
+//获取维修站下的活动
+-(void)getActivityListByStation:(NSString *)page pageSize:(NSString *)pageSize station:(NSString *)station action:(NSString *)action;
+
+//违章查询历史接口
+-(void)queryHistory:(NSString *)user action:(NSString *)action;
+
+//从活动中下订单
+-(void)addOrderByActivity:(NSString *)activity paySource:(NSString *)paySource action:(NSString *)action;
 
 @end

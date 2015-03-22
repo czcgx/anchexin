@@ -52,16 +52,18 @@
     [mainView addSubview:headView];
     
     UIImageView *img=[self customImageView:CGRectMake(25, 60-20, 50, 50) image:nil];
-    [img setImageWithURL:[NSURL URLWithString:[[carArray objectAtIndex:0] objectForKey:@"iconimg"]] placeholderImage:nil];
+    //[img setImageWithURL:[NSURL URLWithString:[carDic objectForKey:@"iconimg"]] placeholderImage:nil];
+    [img sd_setImageWithURL:[NSURL URLWithString:[carDic objectForKey:@"iconimg"]] placeholderImage:nil];
+    
     [mainView addSubview:img];//车的图标
     
-    UILabel *lb1=[self customLabel:CGRectMake(90, 70-20, 200, 20) color:[UIColor whiteColor] text:[NSString stringWithFormat:@"%@  %@",[[carArray objectAtIndex:0] objectForKey:@"carseries"],[[carArray objectAtIndex:0] objectForKey:@"license_number"] ]  alignment:-1 font:16];
+    UILabel *lb1=[self customLabel:CGRectMake(90, 70-20, 200, 20) color:[UIColor whiteColor] text:[NSString stringWithFormat:@"%@  %@",[carDic objectForKey:@"carseries"],[carDic objectForKey:@"license_number"] ]  alignment:-1 font:16];
     lb1.shadowColor=[UIColor blackColor];
     lb1.shadowOffset=CGSizeMake(0, 1.5);
     [mainView addSubview:lb1];
     
   
-    UILabel *lb2=[self customLabel:CGRectMake(90, 90-20, 200, 20) color:[UIColor whiteColor] text:[NSString stringWithFormat:@"里程:%@公里",[[carArray objectAtIndex:0] objectForKey:@"current_mileage"]]  alignment:-1 font:14];
+    UILabel *lb2=[self customLabel:CGRectMake(90, 90-20, 200, 20) color:[UIColor whiteColor] text:[NSString stringWithFormat:@"里程:%@公里",[carDic objectForKey:@"current_mileage"]]  alignment:-1 font:14];
     lb2.shadowColor=[UIColor blackColor];
     lb2.shadowOffset=CGSizeMake(0, 1.5);
     [mainView addSubview:lb2];
@@ -148,6 +150,8 @@
         cell.valueLabel.text=@"";
     }
     
+     cell.iconImageView.hidden=YES;
+    /*
     if (indexPath.row==1)
     {
         cell.iconImageView.hidden=NO;
@@ -156,6 +160,7 @@
     {
         cell.iconImageView.hidden=YES;
     }
+     */
     
     if (indexPath.row==3)
     {
@@ -170,14 +175,17 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    /*
     if (indexPath.row==1)
     {
         if ([[userDic objectForKey:@"valid"] intValue]==0)
         {
+            alertPt=0;
             [self alertNoValid];
         }
         else
         {
+            alertPt=1;
             //修改手机号
             ModifyPwdViewController *modify=[[ModifyPwdViewController alloc] init];
             modify.title=@"修改手机号";
@@ -185,6 +193,8 @@
             [self.navigationController pushViewController:modify animated:YES];
         }
     }
+     */
+    
 }
 
 - (void)didReceiveMemoryWarning
@@ -193,6 +203,20 @@
     // Dispose of any resources that can be recreated.
 }
 
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (alertPt==0)
+    {
+        if (buttonIndex==1)
+        {
+            //NSLog(@"登录");
+            LoginAndResigerViewController *guide=[[LoginAndResigerViewController alloc] init];
+            guide.hidesBottomBarWhenPushed=YES;
+            [self.navigationController pushViewController:guide animated:YES];
+        }
+    }
+}
 
 
 @end

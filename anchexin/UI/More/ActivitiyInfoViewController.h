@@ -8,14 +8,18 @@
 
 #import "BaseViewController.h"
 
-@interface ActivitiyInfoViewController : BaseViewController<UIWebViewDelegate>
+@interface ActivitiyInfoViewController : BaseViewController<UIWebViewDelegate,UIAlertViewDelegate>
 {
     UIWebView *activityWebView;
     int requestFlag;
     
     UIView *view;
     UIView *titleView;
+
+    UIView *alertView;
     
+    NSArray *payArray;
+    NSDictionary *payInfo;
 }
 
 @property(nonatomic,retain)NSDictionary *activityInfo;

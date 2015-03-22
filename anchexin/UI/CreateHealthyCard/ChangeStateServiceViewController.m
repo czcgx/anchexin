@@ -31,13 +31,15 @@
     [self skinOfBackground];
     
     self.title=@"保养卡信息";
- 
+    
+ /*
     //按钮的提交
     UIBarButtonItem *bar=[[UIBarButtonItem alloc] initWithTitle:@"提交" style:UIBarButtonItemStyleBordered target:self action:@selector(barUpload) ];
     bar.tintColor=[UIColor whiteColor];
     self.navigationItem.rightBarButtonItem=bar;
- 
-    maintenanceTableView=[[UITableView alloc]initWithFrame:CGRectMake(0, NavigationBar, WIDTH, 480+(iPhone5?88:0)-NavigationBar)];
+ */
+    
+    maintenanceTableView=[[UITableView alloc]initWithFrame:CGRectMake(0, NavigationBar, WIDTH, 480+(iPhone5?88:0)-NavigationBar-50)];
     maintenanceTableView.tag=2;
     maintenanceTableView.delegate=self;
     maintenanceTableView.dataSource=self;
@@ -46,6 +48,10 @@
     maintenanceTableView.separatorStyle=UITableViewCellSeparatorStyleNone;
     [self.view addSubview:maintenanceTableView];
   
+    UIView *mainView=[[UIView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height-50, WIDTH, 50)];
+    mainView.backgroundColor=[UIColor colorWithRed:241.0/255.0 green:241.0/255.0 blue:241.0/255.0 alpha:1.0];
+    [mainView addSubview:[self customView:CGRectMake(30, 5, 260, 40) labelTitle:@"提交" buttonTag:1]];
+    [self.view addSubview:mainView];
     
     [ToolLen ShowWaitingView:YES];
     flag=1;//获取保养项目
@@ -53,25 +59,22 @@
     
 }
 
+-(void)customEvent:(UIButton *)sender
+{
+    if (sender.tag==1)
+    {
+        [self barUpload];//提交
+    }
+}
+
 
 -(void)barUpload
 {
-    /*
-    //进入首页
-    RootViewController *root=[[RootViewController alloc]init];
-    root.navigationItem.hidesBackButton=YES;
     
-    [self.navigationController pushViewController:root animated:YES];
-    [root release];
-    
-    //[self.navigationController popViewControllerAnimated:YES];
-     */
-    
-    //进入首页
     UITabBarController *tabBarController=[[AppDelegate setGlobal] customTabBarController];
     [AppDelegate setGlobal].rootController = [[DDMenuController alloc] initWithRootViewController:tabBarController];
     
-    [AppDelegate setGlobal].rootController.view.frame=CGRectMake(WIDTH, 0, WIDTH, 480+(iPhone5?88:0));
+    [AppDelegate setGlobal].rootController.view.frame=CGRectMake(0, 0, WIDTH, 480+(iPhone5?88:0));
     
     MoreViewController *more=[[MoreViewController alloc] init];
     [AppDelegate setGlobal].rootController.leftViewController = more;
@@ -79,14 +82,10 @@
     CityViewController *city=[[CityViewController alloc] init];
     [AppDelegate setGlobal].rootController.rightViewController=city;
     
+    //[[UIApplication sharedApplication].keyWindow addSubview:[AppDelegate setGlobal].rootController.view];
     
-     [[UIApplication sharedApplication].keyWindow addSubview:[AppDelegate setGlobal].rootController.view];
-     
-     [UIView animateWithDuration:1.0 animations:^{
-     self.view.frame=CGRectMake(-WIDTH, 0, WIDTH, 480+(iPhone5?88:0));
-     [AppDelegate setGlobal].rootController.view.frame=CGRectMake(0, 0, WIDTH, 480+(iPhone5?88:0));
-     }];
-
+    [[UIApplication sharedApplication].keyWindow addSubview:[AppDelegate setGlobal].rootController.view];
+    
 }
 
 -(void)JSONSuccess:(id)responseObject

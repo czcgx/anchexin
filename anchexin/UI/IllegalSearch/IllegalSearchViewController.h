@@ -25,6 +25,14 @@
     NSDictionary *dic;
     
     NSArray *searchArray;
+    
+    UIAlertController *alertController;
+    
+    int alertPt;
+    
+    int requestFlag;
+    
+    
 }
 
 

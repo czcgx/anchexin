@@ -38,12 +38,14 @@
 -(void)search_search
 {
     pageIndex++;
-    [[self JsonFactory]getRepairStationListBySearch:[NSString stringWithFormat:@"%d",pageIndex] name:searchText.text lat:lat lng:lng action:@"getRepairStationListBySearch"];
+    [[self JsonFactory]getRepairStationListBySearch:[NSString stringWithFormat:@"%d",pageIndex] name:searchText.text lat:lat lng:lng action:@"getStationListBySearch"];
     
 }
 
 -(void)searchIcon
 {
+    [searchText resignFirstResponder];
+    
     if (!searchBool)
     {
         self.navigationItem.rightBarButtonItem.title=@"常用";
@@ -81,7 +83,11 @@
 -(void)viewWillAppear:(BOOL)animated
 {
     [MobClick event:@"stationService"];//统计服务网点页面
+
 }
+
+
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -93,12 +99,16 @@
     UIBarButtonItem *item=[[UIBarButtonItem alloc] initWithTitle:@"搜索"
                                                            style:UIBarButtonItemStylePlain
                                                           target:self
+      
                                                           action:@selector(searchIcon)];
-    item.tintColor=[UIColor whiteColor];
+    
+    if ([[UIDevice currentDevice].systemVersion floatValue] >= 7.0)
+    {
+        item.tintColor=[UIColor whiteColor];
+    }
     
     self.navigationItem.rightBarButtonItem=item;
   
-    
     
     UIView *mainView=[[UIView alloc] initWithFrame:CGRectMake(0, NavigationBar, WIDTH, 480+(iPhone5?88:0)-NavigationBar)];
     mainView.backgroundColor=[UIColor clearColor];
@@ -138,6 +148,8 @@
     searchText.returnKeyType=UIReturnKeyDone;
     searchText.placeholder=@"输入搜索关键字";
     [searchView addSubview:searchText];
+
+    
     /*
     UIButton *searchButton=[UIButton buttonWithType:UIButtonTypeCustom];
     searchButton.frame=CGRectMake(268, 11, 50, 30);
@@ -159,7 +171,7 @@
 
     [upSubView addSubview:searchView];
     
-    
+
     //常用界面
     tabView=[[UIView alloc] initWithFrame:CGRectMake(0, 0, WIDTH, 50)];
     tabView.backgroundColor=[UIColor blackColor];
@@ -238,6 +250,7 @@
         
         [tabView addSubview:[self customButton:label.frame tag:i+100 title:nil state:0 image:nil selectImage:nil color:nil enable:YES]];
     }
+    
     [upSubView addSubview:tabView];
     
     UIView *subView=nil;
@@ -252,37 +265,49 @@
         subView=[[UIView alloc] initWithFrame:CGRectMake(0, 50, WIDTH, mainView.frame.size.height-50-50)];
     }
    
+   
+    [mainView addSubview:subView];
+    [self.view addSubview:mainView];
+    
     serviceTableView=[[UITableView alloc]initWithFrame:CGRectMake(0,0, WIDTH, subView.frame.size.height)];
     serviceTableView.delegate=self;
     serviceTableView.dataSource=self;
-    serviceTableView.backgroundView=nil;
-    serviceTableView.backgroundColor=[UIColor clearColor];
+    if ([[UIDevice currentDevice].systemVersion floatValue] >= 7.0)
+    {
+        serviceTableView.backgroundView=nil;
+        serviceTableView.backgroundColor=[UIColor clearColor];
+    }
     serviceTableView.separatorStyle=UITableViewCellSeparatorStyleNone;
     
     [subView addSubview:serviceTableView];
     
+
     //第三方控件，进行下拉刷新
     _footer = [[MJRefreshFooterView alloc] init];
     _footer.delegate = self;
     _footer.scrollView = serviceTableView;
     
-    [mainView addSubview:subView];
-    [self.view addSubview:mainView];
-    
-    
+
     _drawerView = [[ACNavBarDrawer alloc] initView];
     _drawerView.delegate = self;
     [self.view addSubview:_drawerView];
     
+    if (![AppDelegate setGlobal].currentLatitude || ![AppDelegate setGlobal].currentLongitude)
+    {
+        [AppDelegate setGlobal].currentLatitude=@"";
+        [AppDelegate setGlobal].currentLongitude=@"";
+    }
     
     lat=[AppDelegate setGlobal].currentLatitude;
     lng=[AppDelegate setGlobal].currentLongitude;
     //NSLog(@"%@,%@",lat,lng);
     
     pageIndex=0;
+   // pt=0;
     //[self reloadRequestData:r_city area:r_area type:@""];
     
     [self reloadRequestOrderData:r_city area:r_area order:order];
+   
     
 }
 
@@ -301,7 +326,6 @@
             pageIndex=0;
             
             [self search_search];
-            
             
         }];
     }
@@ -329,11 +353,11 @@
                 
                 break;
             }
-            case 101://选择区域
+            case 101://点击选择区域
             {
                 //tabLine.frame = CGRectMake(WIDTH/3, 42, WIDTH/3, 10);
                 requestTimes=101;
-                if (r_city)
+                if (![r_city isEqualToString:@""])
                 {
                     NSArray *tempArray=[document readDataFromDocument:[NSString stringWithFormat: @"ServiceArea_%@",r_city] IsArray:YES];
                     if (tempArray)
@@ -393,21 +417,40 @@
 -(void)reloadRequestOrderData:(NSString *)city area:(NSString *)area order:(NSString *)order1
 {
     requestTimes=1;
+    //pt=1;
+    
     if (pageIndex==0)//如果是第一个页面，显示转子
     {
         [ToolLen ShowWaitingView:YES];
     }
     
     pageIndex++;
+    
+    //[self alertOnly:[NSString stringWithFormat:@"lat::%@ lng::%@",[AppDelegate setGlobal].currentLatitude,[AppDelegate setGlobal].currentLongitude]];
+    
     //NSLog(@"lat::%@",lat);
-    [[self JsonFactory] get_getRepairStationOrderList:[NSString stringWithFormat:@"%d",pageIndex] city:city area:area order:order1 lng:lng lat:lat  action:@"getRepairStationOrderList"];
+    if ([[userDic objectForKey:@"valid"] intValue]==0)
+    {
+        //lat=[AppDelegate setGlobal].currentLatitude;
+        //lng=[AppDelegate setGlobal].currentLongitude;
+        
+        //测试账户
+        [[self JsonFactory] get_getRepairStationOrderList:[NSString stringWithFormat:@"%d",pageIndex] city:city area:area order:order1 lng:[AppDelegate setGlobal].currentLongitude lat:[AppDelegate setGlobal].currentLatitude  state:0 action:@"getStationListByOrder"];
+    }
+    else
+    {
+        //正式账户
+        [[self JsonFactory] get_getRepairStationOrderList:[NSString stringWithFormat:@"%d",pageIndex] city:city area:area order:order1 lng:[AppDelegate setGlobal].currentLongitude lat:[AppDelegate setGlobal].currentLatitude  state:1  action:@"getStationListByOrder"];
+        
+    }
+    
 }
 
 
 -(void)JSONSuccess:(id)responseObject
 {
     [ToolLen ShowWaitingView:NO];
-    if (responseObject && [[responseObject objectForKey:@""] intValue]==0 && requestTimes==1)
+    if (responseObject && [[responseObject objectForKey:@"errorcode"] intValue]==0 && requestTimes==1)
     {
         if (pageIndex==1 )//如果是第一页，初始化
         {
@@ -420,15 +463,17 @@
         [self performSelector:@selector(reloadDeals) withObject:nil];
 
     }
-    else if (responseObject && [[responseObject objectForKey:@""] intValue]==0 && requestTimes==100)
+    else if (responseObject && [[responseObject objectForKey:@"errorcode"] intValue]==0 && requestTimes==100)
     {
         //保存
         [document saveDataToDocument:@"ServiceCity" fileData:[responseObject objectForKey:@"citylist"]];
         //弹出视图
         [_drawerView openNavBarDrawer:1 Parameters:[responseObject objectForKey:@"citylist"] defaultValue:@""];
+        
+        [document deleteFileFromDocument:[NSString stringWithFormat:@"ServiceArea_%@",[[responseObject objectForKey:@"citylist"] objectAtIndex:0]]];
 
     }
-    else if (responseObject && [[responseObject objectForKey:@""] intValue]==0 && requestTimes==101)
+    else if (responseObject && [[responseObject objectForKey:@"errorcode"] intValue]==0 && requestTimes==101)
     {
         //保存
         [document saveDataToDocument:[NSString stringWithFormat:@"ServiceArea_%@",r_city] fileData:[responseObject objectForKey:@"arealist"]];
@@ -508,7 +553,6 @@
                     }
                     
                     [self reloadRequestOrderData:r_city area:r_area order:order];
-                    
                 }
             }
         }
@@ -538,7 +582,7 @@
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
-    return 100;
+    return 80;
 
 }
 
@@ -565,10 +609,26 @@
         cell.backgroundColor=[UIColor colorWithRed:241.0/255.0 green:241.0/255.0 blue:241.0/255.0 alpha:1.0];
     }
     
-    [cell.stationImageView setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@",[[addArray objectAtIndex:indexPath.row] objectForKey:@"half_img"]]] placeholderImage:nil];
+   // [cell.stationImageView setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@",[[addArray objectAtIndex:indexPath.row] objectForKey:@"half_img"]]] placeholderImage:nil];
+    
+    [cell.stationImageView sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@",[[addArray objectAtIndex:indexPath.row] objectForKey:@"half_img"]]] placeholderImage:nil];
     
     cell.stationNameLabel.text=[[addArray objectAtIndex:indexPath.row] objectForKey:@"name"];
     cell.stationDistanceLabel.text=[NSString stringWithFormat:@"%.1fKm",[[[addArray objectAtIndex:indexPath.row] objectForKey:@"juli"] floatValue]/1000];
+    
+    
+    //好评率
+    float temp=[[[addArray objectAtIndex:indexPath.row] objectForKey:@"avg_comment"] floatValue]*100.0+0.5;
+    int m=temp/20;
+    //NSLog(@"m::%d",m);
+    for (int i=0; i<m; i++)
+    {
+        UIImageView *starImageView=[[UIImageView alloc] initWithFrame:CGRectMake(110+16*i, 28, 20, 20)];
+        starImageView.image=IMAGE(@"commet");
+        [cell.contentView addSubview:starImageView];
+    }
+    
+    cell.orderLabel.text=[NSString stringWithFormat:@"%d单",[[[addArray objectAtIndex:indexPath.row] objectForKey:@"orderCount"] intValue]];
     
     if ([[[addArray objectAtIndex:indexPath.row] objectForKey:@"have_pos"] intValue]==1)
     {
@@ -576,7 +636,7 @@
         cell.stationFlag.hidden=NO;
         for (int i=0; i<4; i++)
         {
-            UIImageView *iconImageView=[[UIImageView alloc] initWithFrame:CGRectMake(140+18*i,72, 15,15)];
+            UIImageView *iconImageView=[[UIImageView alloc] initWithFrame:CGRectMake(115+17*i,55, 15,15)];
             NSString *iconStr=[NSString stringWithFormat:@"station_%d",i+1];
             iconImageView.image=IMAGE(iconStr);
             [cell.contentView addSubview:iconImageView];
@@ -586,17 +646,7 @@
     else
     {
         //隐藏
-         cell.stationFlag.hidden=YES    ;
-    }
-    //好评率
-    float temp=[[[addArray objectAtIndex:indexPath.row] objectForKey:@"avg_comment"] floatValue]*100.0+0.5;
-    int m=temp/20;
-    //NSLog(@"m::%d",m);
-    for (int i=0; i<m; i++)
-    {
-        UIImageView *starImageView=[[UIImageView alloc] initWithFrame:CGRectMake(138+16*i, 40, 20, 20)];
-        starImageView.image=IMAGE(@"commet");
-        [cell.contentView addSubview:starImageView];
+        cell.stationFlag.hidden=YES;
     }
     
     return cell;
@@ -607,14 +657,25 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    /*
     StationInfoViewController *stationInfo=[[StationInfoViewController alloc] init];
     stationInfo.hidesBottomBarWhenPushed=YES;
     stationInfo.title=@"维修站详情";
     stationInfo.orderArry=orderArray;
     stationInfo.stationInfo=[addArray objectAtIndex:indexPath.row];//店面信息
     [self.navigationController pushViewController:stationInfo animated:YES];
+     */
+    
+    New_StationInfoViewController *station=[[New_StationInfoViewController alloc] init];
+    station.hidesBottomBarWhenPushed=YES;
+    station.title=@"维修站详情";
+    station.stationInfo=[addArray objectAtIndex:indexPath.row];//店面信息
+    
+    [self.navigationController pushViewController:station animated:YES];
+    
     
 }
+
 
 
 //上拉更新加载更多数据

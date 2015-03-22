@@ -35,7 +35,7 @@
     //清除UIWebView的缓存
     [[NSURLCache sharedURLCache] removeAllCachedResponses];
     
-    NSString *urlString=[NSString stringWithFormat:@"http://apiv200.anchexin.com/getRepairOrder?repairOrder=%@&isVip=1",[repairRecord objectForKey:@"id"]];
+    NSString *urlString=[NSString stringWithFormat:@"%@getRepairOrder?repairOrder=%@&isVip=1",AFBaseURLString,[repairRecord objectForKey:@"id"]];
     //NSLog(@"urlString:%@",urlString);
     
     [infoWebView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:urlString]]];

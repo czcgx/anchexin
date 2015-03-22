@@ -15,5 +15,6 @@
 
 
 @property(nonatomic,retain)NSDictionary *stationInfo;
+@property(nonatomic,assign)int state;
 
 @end

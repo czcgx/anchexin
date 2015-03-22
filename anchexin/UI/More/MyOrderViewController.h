@@ -26,4 +26,6 @@
 }
 
 @property(nonatomic,assign)int state;
+@property(nonatomic,assign)int selected;
+
 @end

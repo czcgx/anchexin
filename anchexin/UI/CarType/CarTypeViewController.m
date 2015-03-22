@@ -26,12 +26,12 @@
 
 -(void)popself
 {
-    UITabBarController *tabBarController=[[AppDelegate setGlobal] customTabBarController];
-    [tabBarController setSelectedIndex:2];
+    //UITabBarController *tabBarController=[[AppDelegate setGlobal] customTabBarController];
+    //[tabBarController setSelectedIndex:2];
+    
     [self.navigationController dismissViewControllerAnimated:YES completion:^{
         
     }];
-    //[self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)viewDidLoad
@@ -41,7 +41,16 @@
     [self skinOfBackground];
     self.title=@"车型选择";
    // self.view.backgroundColor=kUIColorFromRGB(0x1c1c1c);
-   
+   /*
+    UIImage *image=IMAGE(@"thebackbuttonbg");//返回按钮的背景
+    UIButton *btn=[UIButton buttonWithType:UIButtonTypeCustom];
+    btn.frame=CGRectMake(0, 10, 25, 25);
+    [btn setBackgroundImage:image forState:UIControlStateNormal];
+    [btn addTarget:self action:@selector(popself) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *backItem = [[UIBarButtonItem alloc] initWithCustomView:btn];
+    self.navigationItem.leftBarButtonItem=backItem;
+    */
+    
     if (state==0)
     {
         self.navigationItem.hidesBackButton=YES;
@@ -64,7 +73,7 @@
     
     carTableView=[[UITableView alloc]initWithFrame:CGRectMake(0, NavigationBar, WIDTH, 480+(iPhone5?88:0)-NavigationBar)];
    
-    carTableView.sectionIndexColor=[UIColor whiteColor];
+    carTableView.sectionIndexColor=[UIColor blackColor];
     carTableView.sectionIndexBackgroundColor=[UIColor clearColor];
     carTableView.sectionIndexTrackingBackgroundColor = [UIColor clearColor];
     
@@ -173,23 +182,26 @@
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
     UIView *bgView=[[UIView alloc] initWithFrame:CGRectMake(0, 0, WIDTH, 30)];
-    bgView.backgroundColor=kUIColorFromRGB(0x1c1c1c);
-    
+    bgView.backgroundColor=kUIColorFromRGB(0xf1f1f1);
+    /*
     UILabel *upLabel=[[UILabel alloc] initWithFrame:CGRectMake(0, 0, WIDTH, 0.5)];
-    upLabel.backgroundColor=kUIColorFromRGB(0x3a3a3a);
+    upLabel.backgroundColor=[UIColor lightGrayColor];//kUIColorFromRGB(0x3a3a3a);
     [bgView addSubview:upLabel];
+    */
     
     UILabel *sectionLabel=[[UILabel alloc] initWithFrame:CGRectMake(15, 5, 30, 20)];
     sectionLabel.backgroundColor=[UIColor clearColor];
     sectionLabel.textAlignment=NSTextAlignmentLeft;
-    sectionLabel.textColor=[UIColor whiteColor];
+    sectionLabel.textColor=[UIColor blackColor];
     sectionLabel.font=[UIFont boldSystemFontOfSize:19.0];
     sectionLabel.text=sections[section];
     [bgView addSubview:sectionLabel];
     
     UILabel *downLabel=[[UILabel alloc] initWithFrame:CGRectMake(0, 29.5, WIDTH, 0.5)];
-    downLabel.backgroundColor=kUIColorFromRGB(0x3a3a3a);
+    downLabel.backgroundColor=[UIColor lightGrayColor];//kUIColorFromRGB(0x3a3a3a);
     [bgView addSubview:downLabel];
+    
+    
     
     return bgView;
 }
@@ -216,14 +228,15 @@
     }
     
     UILabel *labelbg=[[UILabel alloc] initWithFrame:CGRectMake(0, 59.5, WIDTH, 0.5)];
-    labelbg.backgroundColor=kUIColorFromRGB(0x3a3a3a);
+    labelbg.backgroundColor=[UIColor lightGrayColor];//kUIColorFromRGB(0x3a3a3a);
     [cell.contentView addSubview:labelbg];
     
     for (int i=0; i<[array count]; i++)
     {
         if ([[[array objectAtIndex:i] objectForKey:@"name"] isEqualToString:rows[indexPath.section][indexPath.row]])
         {
-            [cell.imageViewIcon setImageWithURL:[NSURL URLWithString:[[array objectAtIndex:i] objectForKey:@"img"]] placeholderImage:nil];
+            //[cell.imageViewIcon setImageWithURL:[NSURL URLWithString:[[array objectAtIndex:i] objectForKey:@"img"]] placeholderImage:nil];
+            [cell.imageViewIcon sd_setImageWithURL:[NSURL URLWithString:[[array objectAtIndex:i] objectForKey:@"img"]] placeholderImage:nil];
             
             break;
         }

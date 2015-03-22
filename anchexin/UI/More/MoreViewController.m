@@ -34,10 +34,10 @@
     UIView *mainView=[[UIView alloc] initWithFrame:CGRectMake(0, 20, WIDTH, 480+(iPhone5?88:0)-20)];
     mainView.backgroundColor=[UIColor clearColor];
     
-    //@"行程分析",@"车况诊断",,@"设备绑定"
-    moreArray=[[NSArray alloc] initWithObjects:@[@"返回"],@[@"我的订单",@"市场活动"],@[@"账户信息",@"修改密码",@"身份二维码",@"车辆管理"],@[@"操作指南",@"关于我们",@"换肤",@"注销"], nil];
-    //@"icon2",@"icon3",@"icon8"
-    moreIconArray=[[NSArray alloc] initWithObjects:@[@"tab3@2x"],@[@"icon1",@"icon4",],@[@"icon5",@"icon6",@"icon7",@"icon9",],@[@"icon10",@"icon11",@"icon12",@"icon13"], nil];
+    //@"行程分析",@"车况诊断",,@"设备绑定"@"修改密码",
+    moreArray=[[NSArray alloc] initWithObjects:@[@"返回"],@[@"我的订单",@"优惠活动",@"常去店铺"],@[@"账户信息",@"身份二维码",@"车辆管理"],@[@"操作指南",@"关于我们",@"意见反馈",@"换肤",@"注销"], nil];
+    //@"icon2",@"icon3",@"icon8"//,,,,@"icon6",
+    moreIconArray=[[NSArray alloc] initWithObjects:@[@"tab3@2x"],@[@"icon1",@"icon4",@"icon14"],@[@"icon5",@"icon7",@"icon9",],@[@"icon10",@"icon11",@"icon15",@"icon12",@"icon13"], nil];
     
     moreTableView=[[UITableView alloc]initWithFrame:CGRectMake(0,0, WIDTH, mainView.frame.size.height)];
     moreTableView.delegate=self;
@@ -149,6 +149,7 @@
                 CustomNavigationController *nav=[[CustomNavigationController alloc] initWithRootViewController:order];
                 order.state=1;
                 order.title=@"我的订单";
+                order.selected=0;
                 [[AppDelegate setGlobal].rootController setRootController:nav animated:YES];
     
                 /*
@@ -166,47 +167,26 @@
                 
                 break;
             }
-            case 11://行程分析
-            {
-                AnalysisViewController *analysis=[[AnalysisViewController alloc] init];
-                CustomNavigationController *nav=[[CustomNavigationController alloc] initWithRootViewController:analysis];
-                
-                analysis.title=@"行程分析";
-                [[AppDelegate setGlobal].rootController setRootController:nav animated:YES];
-                
-                /*
-                [[NSUserDefaults standardUserDefaults] setObject:@"bg1.jpg" forKey:@"DefaultBackground"];
-                
-                [self alertOnly:@"更换皮肤成功"];
-                
-                //通知
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"changeBgImg" object:nil userInfo:nil];
-                
-                //通知
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"homeSkin" object:nil userInfo:nil];
-                */
-                
-                
-                break;
-            }
-            case 12://车况诊断
-            {
-                VehicleDiagnosisViewController *vehicleDiagnosis=[[VehicleDiagnosisViewController alloc] init];
-                CustomNavigationController *nav=[[CustomNavigationController alloc] initWithRootViewController:vehicleDiagnosis];
-                
-                vehicleDiagnosis.title=@"车况诊断";
-                [[AppDelegate setGlobal].rootController setRootController:nav animated:YES];
-                
-                break;
-            }
             case 1://市场活动
             {
                
-                ActivityViewController *activity=[[ActivityViewController alloc] init];
-                CustomNavigationController *nav=[[CustomNavigationController alloc] initWithRootViewController:activity];
+               // ActivityViewController *activity=[[ActivityViewController alloc] init];
+                New_ActivityViewController *activity=[[New_ActivityViewController alloc] init];
+                CustomNavigationController *navActivity=[[CustomNavigationController alloc] initWithRootViewController:activity];
                 
-                activity.title=@"市场活动";
-                [[AppDelegate setGlobal].rootController setRootController:nav animated:YES];
+                activity.title=@"优惠活动";
+                [[AppDelegate setGlobal].rootController setRootController:navActivity animated:YES];
+                
+                break;
+            }
+            case 2://常去店铺
+            {
+                
+                CollectionShopViewController *collect=[[CollectionShopViewController alloc] init];
+                CustomNavigationController *navCollect=[[CustomNavigationController alloc] initWithRootViewController:collect];
+                
+                collect.title=@"常去店铺";
+                [[AppDelegate setGlobal].rootController setRootController:navCollect animated:YES];
                 
                 break;
             }
@@ -229,6 +209,7 @@
                 
                 break;
             }
+                /*
             case 1://修改密码
             {
                 ModifyPwdViewController *modifyPwd=[[ModifyPwdViewController alloc] init];
@@ -240,7 +221,8 @@
                 
                 break;
             }
-            case 2://二维码
+                 */
+            case 1://二维码
             {
                 CodeViewController *code=[[CodeViewController alloc] init];
                 CustomNavigationController *navAccount=[[CustomNavigationController alloc] initWithRootViewController:code];
@@ -250,17 +232,7 @@
                 
                 break;
             }
-            case 13://设备绑定
-            {
-                BlindOBDViewController *obd=[[BlindOBDViewController alloc] init];
-                CustomNavigationController *navAccount=[[CustomNavigationController alloc] initWithRootViewController:obd];
-                
-                obd.title=@"设备绑定";
-                [[AppDelegate setGlobal].rootController setRootController:navAccount animated:YES];
-                
-                break;
-            }
-            case 3://车辆管理
+            case 2://车辆管理
             {
                 CarManageViewController *manage=[[CarManageViewController alloc] init];
                 CustomNavigationController *navAccount=[[CustomNavigationController alloc] initWithRootViewController:manage];
@@ -301,7 +273,17 @@
                 
                 break;
             }
-            case 2://换肤
+            case 2://意见反馈
+            {
+                FeedbackViewController *feed=[[FeedbackViewController alloc] init];
+                CustomNavigationController *navAccount=[[CustomNavigationController alloc] initWithRootViewController:feed];
+                
+                feed.title=@"意见反馈";
+                [[AppDelegate setGlobal].rootController setRootController:navAccount animated:YES];
+                
+                break;
+            }
+            case 3://换肤
             {
                 
                 SkinViewController *skin=[[SkinViewController alloc] init];
@@ -314,12 +296,19 @@
                 
                 break;
             }
-            case 3://注销
+            case 4://注销
             {
                
                 [document deleteFileFromDocument:@"user"];//删除保存的用户信息
                 [document deleteFileFromDocument:@"car"];//删除车辆信息
+                
+                [document deleteFileFromDocument:@"ServiceCity"];//删除城市
+                
+                
                 [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"vaild"];//无效
+                //置空
+                [AppDelegate setGlobal].token=nil;
+                [AppDelegate setGlobal].uid=nil;
                 
                 LoginGuideViewController *guide=[[LoginGuideViewController alloc] init];
                 CustomNavigationController *navAccount=[[CustomNavigationController alloc] initWithRootViewController:guide];

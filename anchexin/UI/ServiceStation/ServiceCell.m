@@ -13,6 +13,7 @@
 @synthesize stationImageView;
 @synthesize stationNameLabel;
 @synthesize stationFlag;
+@synthesize orderLabel;
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {

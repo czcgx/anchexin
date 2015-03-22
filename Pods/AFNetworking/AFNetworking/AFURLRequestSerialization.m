@@ -193,7 +193,7 @@ NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
     self.HTTPShouldHandleCookies = YES;
     self.HTTPShouldUsePipelining = NO;
     self.networkServiceType = NSURLNetworkServiceTypeDefault;
-    self.timeoutInterval = 60;
+    self.timeoutInterval = 10;
 
     self.mutableHTTPRequestHeaders = [NSMutableDictionary dictionary];
 
@@ -204,6 +204,7 @@ NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
         [acceptLanguagesComponents addObject:[NSString stringWithFormat:@"%@;q=%0.1g", obj, q]];
         *stop = q <= 0.5f;
     }];
+    
     [self setValue:[acceptLanguagesComponents componentsJoinedByString:@", "] forHTTPHeaderField:@"Accept-Language"];
 
     NSString *userAgent = nil;

@@ -14,6 +14,7 @@
 
 @implementation MyOrderViewController
 @synthesize state;
+@synthesize selected;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -43,19 +44,23 @@
     tabView.backgroundColor=[UIColor clearColor];
     [tabView addSubview:[self customImageView:tabView.bounds image:IMAGE(@"rootbg")]];
     
-    UILabel *label1=[[UILabel alloc] initWithFrame:CGRectMake(160, 10, 1, 30)];
+    UILabel *label1=[[UILabel alloc] initWithFrame:CGRectMake(WIDTH/3, 10, 1, 30)];
     label1.backgroundColor=[UIColor whiteColor];
     [tabView addSubview:label1];
     
-    NSArray *tabArray=[NSArray arrayWithObjects:@"预约工单",@"工单", nil];
+    UILabel *label2=[[UILabel alloc] initWithFrame:CGRectMake(WIDTH/3*2, 10, 1, 30)];
+    label2.backgroundColor=[UIColor whiteColor];
+    [tabView addSubview:label2];
+    
+    NSArray *tabArray=[NSArray arrayWithObjects:@"预约工单",@"已支付",@"工单", nil];
     for (int i=0; i<tabArray.count; i++)
     {
-        UILabel *label=[[UILabel alloc] initWithFrame:CGRectMake(160*i, 10, 160, 30)];
+        UILabel *label=[[UILabel alloc] initWithFrame:CGRectMake(WIDTH/3*i, 10, WIDTH/3, 30)];
         label.backgroundColor=[UIColor clearColor];
         label.font=[UIFont systemFontOfSize:16.0];
         label.text=[tabArray objectAtIndex:i];
         label.tag=i+100;
-        if (i==0)
+        if (i==selected)
         {
             label.textColor=[UIColor yellowColor];
         }
@@ -71,9 +76,9 @@
     }
     
     //指示图标
-    tabLine=[[UIView alloc] initWithFrame:CGRectMake(0, 40, 160, 10)];
+    tabLine=[[UIView alloc] initWithFrame:CGRectMake(WIDTH/3 *selected, 40, WIDTH/3, 10)];
     tabLine.backgroundColor=[UIColor clearColor];
-    [tabLine addSubview:[self customImageView:CGRectMake(73, 0, 15, 10) image:IMAGE(@"sanjiao")]];
+    [tabLine addSubview:[self customImageView:CGRectMake((WIDTH/3-15)/2, 0, 15, 10) image:IMAGE(@"sanjiao")]];
     [tabView addSubview:tabLine];
     [mainView addSubview:tabView];
     
@@ -93,8 +98,17 @@
     [self.view addSubview:mainView];
 
     [ToolLen ShowWaitingView:YES];
-    requestTimes=0;
-    [[self JsonFactory] getRequestList:nil statusList:@"-2,-1,0,1,2,3" token:nil action:@"getRequestList"];
+    if (selected==0)
+    {
+        requestTimes=0;
+        [[self JsonFactory] getRequestList:nil statusList:@"-2,-1,0,1,2,3" token:nil action:@"getRequestList"];
+    }
+    else
+    {
+        requestTimes=2;
+        [[self JsonFactory] getOrderList:@"1" page:@"0" pageSize:@"20" action:@"getOrderList"];
+    }
+    
 }
 
 -(void)JSONSuccess:(id)responseObject
@@ -115,9 +129,36 @@
         [orderTableView reloadData];//加载数据
         
     }
+    else if (responseObject && [[responseObject objectForKey:@"errorcode"] intValue]==0 && requestTimes==2)
+    {
+        repairArray=nil;
+        orderList=[[NSArray alloc] initWithArray:[responseObject objectForKey:@"orderList"]];
+        
+        [orderTableView reloadData];
+    }
     else
     {
+        /*
+        if ([[responseObject objectForKey:@"errorcode"] intValue]==-5)
+        {
+            [self alertOnly:[responseObject objectForKey:@"未获取预约详情"]];
+        }
+        else if ([[responseObject objectForKey:@"errorcode"] intValue]==-3)
+        {
+            [self alertOnly:[responseObject objectForKey:@"未获取工单详情"]];
+        }
+        else
+        {
+            [self alertOnly:[responseObject objectForKey:@"message"]];
+        }
+         */
+        
         [self alertOnly:[responseObject objectForKey:@"message"]];
+        
+        
+        repairArray=nil;
+        orderList=nil;
+        [orderTableView reloadData];//加载数据
     }
     
     
@@ -152,7 +193,7 @@
         {
             case 100:
             {
-                tabLine.frame = CGRectMake(0, 40, 160, 10);
+                tabLine.frame = CGRectMake(0, 40, WIDTH/3, 10);
                 
                 [ToolLen ShowWaitingView:YES];
                 requestTimes=0;
@@ -162,12 +203,23 @@
             }
             case 101:
             {
-                tabLine.frame = CGRectMake(160, 40, 160, 10);
+                tabLine.frame = CGRectMake(WIDTH/3, 40, WIDTH/3, 10);
+                
+                //只获取付款的。0:微信支付，1:支付宝支付
+                [ToolLen ShowWaitingView:YES];
+                requestTimes=2;
+                [[self JsonFactory] getOrderList:@"1" page:@"0" pageSize:@"20" action:@"getOrderList"];
+               
+                break;
+            }
+            case 102:
+            {
+                tabLine.frame = CGRectMake(WIDTH/3*2, 40, WIDTH/3, 10);
                 
                 [ToolLen ShowWaitingView:YES];
                 requestTimes=1;
-                [[self JsonFactory] get_getRepairOrder:[[[carArray objectAtIndex:0] objectForKey:@"carid"] stringValue] action:@"getRepairOrderList"];//维修记录
-               
+                [[self JsonFactory] get_getRepairOrder:[[carDic objectForKey:@"carid"] stringValue] action:@"getRepairOrderList"];//维修记录
+                
                 break;
             }
         
@@ -192,7 +244,7 @@
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    if (requestTimes==0)
+    if (requestTimes==0 || requestTimes==2)
     {
         return [orderList count];
     }
@@ -214,7 +266,7 @@
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (requestTimes==0)
+    if (requestTimes==0 || requestTimes==2)
     {
         static NSString *cellIndefiner=@"cellIndefiner";
         
@@ -236,41 +288,85 @@
             cell.backgroundColor=[UIColor colorWithRed:241.0/255.0 green:241.0/255.0 blue:241.0/255.0 alpha:1.0];
         }
         
-        if ([[[orderList objectAtIndex:indexPath.row] objectForKey:@"status"] intValue]==1)
+        if (requestTimes==0)
         {
-            //已受理
-            cell.iconImageView.image=IMAGE(@"order_1");
+            if ([[[orderList objectAtIndex:indexPath.row] objectForKey:@"status"] intValue]==1)
+            {
+                //已受理
+                cell.iconImageView.image=IMAGE(@"order_1");
+            }
+            else if ([[[orderList objectAtIndex:indexPath.row] objectForKey:@"status"] intValue]==-2)
+            {
+                //已过期(包括待受理超时和已受理超时)
+                cell.iconImageView.image=IMAGE(@"order_5");
+            }
+            else if ([[[orderList objectAtIndex:indexPath.row] objectForKey:@"status"] intValue]==-1)
+            {
+                //撤销请求(客户取消待受理)
+                cell.iconImageView.image=IMAGE(@"order_2");
+            }
+            else if ([[[orderList objectAtIndex:indexPath.row] objectForKey:@"status"] intValue]==0)
+            {
+                //待受理
+                cell.iconImageView.image=IMAGE(@"order_0");
+            }
+            else if ([[[orderList objectAtIndex:indexPath.row] objectForKey:@"status"] intValue]==2)
+            {
+                //拒绝受理(维修点拒绝受理)
+                cell.iconImageView.image=IMAGE(@"order_5");
+            }
+            else if ([[[orderList objectAtIndex:indexPath.row] objectForKey:@"status"] intValue]==3)
+            {
+                //已经消费
+                cell.iconImageView.image=IMAGE(@"order_3");
+            }
+            
+            
+            
+            cell.shopNameLabel.text=[[orderList objectAtIndex:indexPath.row] objectForKey:@"stationName"];
+            cell.timeLabel.text=[[orderList objectAtIndex:indexPath.row] objectForKey:@"startTime"];
         }
-        else if ([[[orderList objectAtIndex:indexPath.row] objectForKey:@"status"] intValue]==-2)
+        else
         {
-            //已过期(包括待受理超时和已受理超时)
-            cell.iconImageView.image=IMAGE(@"order_5");
+            cell.iconImageView.hidden=YES;
+            cell.shopNameLabel.frame=CGRectMake(15, 20, 290, 20);
+            if ([[[orderList objectAtIndex:indexPath.row] objectForKey:@"type"] intValue]==0)
+            {
+                //维修站名称
+                cell.shopNameLabel.text=[[[orderList objectAtIndex:indexPath.row] objectForKey:@"station"] objectForKey:@"name"];
+            }
+            else
+            {
+                //活动标题
+                cell.shopNameLabel.text=[[[orderList objectAtIndex:indexPath.row] objectForKey:@"activity"] objectForKey:@"title"];
+            }
+            
+            
+            cell.timeLabel.frame=CGRectMake(15, 44, 160, 21);
+            cell.timeLabel.text=[NSString stringWithFormat:@"%@",[[orderList objectAtIndex:indexPath.row] objectForKey:@"createTime"]];
+            /*
+            shopName.font=[UIFont systemFontOfSize:17.0];
+            
+            UILabel *shopName=[[UILabel alloc] initWithFrame:CGRectMake(15, 20, 290, 20)];
+            shopName.backgroundColor=[UIColor clearColor];
+            shopName.textAlignment=NSTextAlignmentCenter;
+            shopName.textColor=[UIColor blackColor];
+            shopName.text=[[[orderList objectAtIndex:indexPath.row] objectForKey:@"station"] objectForKey:@"name"];
+            shopName.font=[UIFont systemFontOfSize:17.0];
+            [cell.contentView addSubview:shopName];
+            
+            
+            UILabel *shopedit=[[UILabel alloc] initWithFrame:CGRectMake(15, 20, 290, 20)];
+            shopedit.backgroundColor=[UIColor clearColor];
+            shopedit.textAlignment=NSTextAlignmentCenter;
+            shopedit.textColor=[UIColor blackColor];
+            shopedit.text=[[orderList objectAtIndex:indexPath.row] objectForKey:@"createTime"];
+            shopedit.font=[UIFont systemFontOfSize:17.0];
+            [cell.contentView addSubview:shopedit];
+             */
+            
         }
-        else if ([[[orderList objectAtIndex:indexPath.row] objectForKey:@"status"] intValue]==-1)
-        {
-            //撤销请求(客户取消待受理)
-            cell.iconImageView.image=IMAGE(@"order_2");
-        }
-        else if ([[[orderList objectAtIndex:indexPath.row] objectForKey:@"status"] intValue]==0)
-        {
-            //待受理
-            cell.iconImageView.image=IMAGE(@"order_0");
-        }
-        else if ([[[orderList objectAtIndex:indexPath.row] objectForKey:@"status"] intValue]==2)
-        {
-            //拒绝受理(维修点拒绝受理)
-            cell.iconImageView.image=IMAGE(@"order_5");
-        }
-        else if ([[[orderList objectAtIndex:indexPath.row] objectForKey:@"status"] intValue]==3)
-        {
-            //已经消费
-            cell.iconImageView.image=IMAGE(@"order_3");
-        }
-        
-        
-        
-        cell.shopNameLabel.text=[[orderList objectAtIndex:indexPath.row] objectForKey:@"stationName"];
-        cell.timeLabel.text=[[orderList objectAtIndex:indexPath.row] objectForKey:@"startTime"];
+      
         
         return cell;
 
@@ -312,10 +408,11 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
-    if (requestTimes==0)
+    if (requestTimes==0 || requestTimes==2)
     {
         OrderInfoViewController *info=[[OrderInfoViewController alloc] init];
         info.stationInfo=[orderList objectAtIndex:indexPath.row];
+        info.state=requestTimes;
         [self.navigationController pushViewController:info animated:YES];
     }
     else

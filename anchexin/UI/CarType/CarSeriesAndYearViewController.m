@@ -65,12 +65,25 @@
     }
     else if ([[responseObject objectForKey:@"errorcode"] intValue]==0 && responseObject!=nil && flag==2 && responseObject)
     {
+        /*
         //创建健康卡
         CreateHealthyCarViewController *create=[[CreateHealthyCarViewController alloc]init];
         create.blindcarID=[responseObject objectForKey:@"carid"];//绑定车辆的id
         //create.hidesBottomBarWhenPushed=YES;
         create.state=1;
         [self.navigationController pushViewController:create animated:YES];
+         */
+        
+        
+        //设置通知
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshCar" object:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@%@",series,carName],[responseObject objectForKey:@"carid"], nil]];
+        
+        
+        //消除层
+        [self.navigationController dismissViewControllerAnimated:YES completion:^{
+            
+        }];
+        
     }
   
 }
@@ -121,18 +134,24 @@
     //绑定接口
     [ToolLen ShowWaitingView:YES];
     flag=2;
+    
     /*
-    if (carArray.count>0)
+    NSString *carID;
+    if ([carDic count]>0)
     {
-        //从ipos端创建的用户，未绑定车辆
-        [[self JsonFactory] setCarType:[[seriesYearArray objectAtIndex:indexPath.row] objectForKey:@"name"] carId:[[AppDelegate setGlobal].carDic objectForKey:@"carid"] brandId:brandID carmodelid:[[seriesYearArray objectAtIndex:indexPath.row] objectForKey:@"id"] series:series action:@"setCarType"];
+        carID=[carDic objectForKey:@"carid"];
     }
     else
     {
+        carID=@"";
     }
     */
     
-    [[self JsonFactory] setCarType:[[seriesYearArray objectAtIndex:indexPath.row] objectForKey:@"name"] carId:@"" brandId:brandID carmodelid:[[seriesYearArray objectAtIndex:indexPath.row] objectForKey:@"id"] series:series action:@"setCarType"];
+
+    //NSLog(@"carid::%@",[[NSUserDefaults standardUserDefaults] objectForKey:@"Save_CarId"]);
+    carName=[[seriesYearArray objectAtIndex:indexPath.row] objectForKey:@"name"];
+    
+    [[self JsonFactory] setCarType:carName carId:[[NSUserDefaults standardUserDefaults] objectForKey:@"Save_CarId"] brandId:brandID carmodelid:[[seriesYearArray objectAtIndex:indexPath.row] objectForKey:@"id"] series:series action:@"setCarType"];
 
 }
 

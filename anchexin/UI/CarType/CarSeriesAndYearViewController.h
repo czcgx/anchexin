@@ -8,7 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-#import "CreateHealthyCarViewController.h"//创建健康卡
 
 @interface CarSeriesAndYearViewController : BaseViewController<UITableViewDataSource,UITableViewDelegate>
 {
@@ -18,10 +17,14 @@
     
     int flag;
     
+    NSString *carName;
+    
 }
 
 @property(nonatomic,retain)NSString *seriesid;
 @property(nonatomic,retain)NSString *year;
 @property(nonatomic,retain)NSString *brandID;
 @property(nonatomic,retain)NSString * series;
+
+
 @end

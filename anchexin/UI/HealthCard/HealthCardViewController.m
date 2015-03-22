@@ -47,19 +47,21 @@
     UIView *orderView=[[UIView alloc] initWithFrame:CGRectMake(0,tabContentView_1.frame.size.height-50, WIDTH, 50)];
     orderView.backgroundColor=[UIColor colorWithRed:224.0/255.0 green:224.0/255.0 blue:224.0/255.0 alpha:1.0];
     
+    /*
     [orderView addSubview:[self customLabel:CGRectMake(15, 15, 80, 20) color:[UIColor darkGrayColor] text:@"您选择了" alignment:-1 font:17.0]];
     chooseLabel=[self customLabel:CGRectMake(95, 15, 50, 20) color:[UIColor redColor] text:@"0项" alignment:-1 font:17.0];
     [orderView addSubview:chooseLabel];
     [orderView addSubview:[self customLabel:CGRectMake(135, 15, 50, 20) color:[UIColor darkGrayColor] text:@"服务" alignment:-1 font:17.0]];
+    */
     
-    UIView *buttonView=[[UIView alloc] initWithFrame:CGRectMake(205, 10, 100, 30)];
+    UIView *buttonView=[[UIView alloc] initWithFrame:CGRectMake((WIDTH-150)/2, 5, 150, 40)];
     buttonView.backgroundColor=[UIColor clearColor];
     buttonView.layer.cornerRadius = 5;//(值越大，角就越圆)
     buttonView.layer.masksToBounds = YES;
     buttonView.layer.borderWidth=1.0;
     buttonView.layer.borderColor=[[UIColor darkGrayColor] CGColor];
-    [buttonView addSubview:[self customImageView:CGRectMake(5, 3, 24, 24) image:IMAGE(@"orderhealth")]];
-    [buttonView addSubview:[self customLabel:CGRectMake(30,5, 80, 20) color:[UIColor darkGrayColor] text:@"现在预约" alignment:-1 font:16.0]];
+    [buttonView addSubview:[self customImageView:CGRectMake(10, 8, 24, 24) image:IMAGE(@"orderhealth")]];
+    [buttonView addSubview:[self customLabel:CGRectMake(40,10, 120, 20) color:[UIColor darkGrayColor] text:@"查找认证商家" alignment:-1 font:16.0]];
     [buttonView addSubview:[self customButton:buttonView.bounds tag:11 title:nil state:0 image:nil selectImage:nil color:nil enable:YES]];
     [orderView addSubview:buttonView];
 
@@ -134,15 +136,16 @@
     headView.layer.borderColor=[[UIColor lightGrayColor] CGColor];
     [mainView addSubview:headView];
     img=[self customImageView:CGRectMake(25, 60-20, 50, 50) image:nil];
-    [img setImageWithURL:[NSURL URLWithString:[[carArray objectAtIndex:0] objectForKey:@"iconimg"]] placeholderImage:nil];
+   //[img setImageWithURL:[NSURL URLWithString:[carDic objectForKey:@"iconimg"]] placeholderImage:nil];
+    [img sd_setImageWithURL:[NSURL URLWithString:[carDic objectForKey:@"iconimg"]]  placeholderImage:nil];
     [mainView addSubview:img];//车的图标
     
-    lb1=[self customLabel:CGRectMake(90, 70-20, 200, 20) color:[UIColor whiteColor] text:[NSString stringWithFormat:@"%@  %@",[[carArray objectAtIndex:0] objectForKey:@"carseries"],[[carArray objectAtIndex:0] objectForKey:@"license_number"] ] alignment:-1 font:16];
+    lb1=[self customLabel:CGRectMake(90, 70-20, 200, 20) color:[UIColor whiteColor] text:[NSString stringWithFormat:@"%@  %@",[carDic objectForKey:@"carseries"],[carDic objectForKey:@"license_number"] ] alignment:-1 font:16];
     lb1.shadowColor=[UIColor blackColor];
     lb1.shadowOffset=CGSizeMake(0, 1.5);
     [mainView addSubview:lb1];
     
-    currentKmLabel=[self customLabel:CGRectMake(90, 90-20, 150, 20) color:[UIColor whiteColor] text:[NSString stringWithFormat:@"里程:%@公里",[[carArray objectAtIndex:0] objectForKey:@"current_mileage"] ] alignment:-1 font:14];
+    currentKmLabel=[self customLabel:CGRectMake(90, 90-20, 150, 20) color:[UIColor whiteColor] text:[NSString stringWithFormat:@"里程:%@公里",[carDic objectForKey:@"current_mileage"] ] alignment:-1 font:14];
     currentKmLabel.shadowColor=[UIColor blackColor];
     currentKmLabel.shadowOffset=CGSizeMake(0, 1.5);
     [mainView addSubview:currentKmLabel];
@@ -152,7 +155,7 @@
     //代办服务
     [ToolLen ShowWaitingView:YES];
     requestTimes=1;
-    [[self JsonFactory] get_getServiceToDo:[[[carArray objectAtIndex:0] objectForKey:@"carid"] stringValue] action:@"getServiceToDo"];//待办服务
+    [[self JsonFactory] get_getServiceToDo:[[carDic objectForKey:@"carid"] stringValue] action:@"getServiceToDo"];//待办服务
     
     
     //tab
@@ -215,39 +218,43 @@
 
 -(void)refreshUI
 {
-    if (carArray.count>0)
+    [self refreshAccount];
+  
+    if (carDic.count>0)
     {
-        [img setImageWithURL:[NSURL URLWithString:[[carArray objectAtIndex:0] objectForKey:@"iconimg"]] placeholderImage:nil];
-        lb1.text=[NSString stringWithFormat:@"%@  %@",[[carArray objectAtIndex:0] objectForKey:@"carseries"],[[carArray objectAtIndex:0] objectForKey:@"license_number"] ];
-        currentKmLabel.text=[NSString stringWithFormat:@"里程:%@公里",[[carArray objectAtIndex:0] objectForKey:@"current_mileage"]];
+        //[img setImageWithURL:[NSURL URLWithString:[carDic objectForKey:@"iconimg"]] placeholderImage:nil];
+        [img sd_setImageWithURL:[NSURL URLWithString:[carDic objectForKey:@"iconimg"]] placeholderImage:nil];
+        lb1.text=[NSString stringWithFormat:@"%@  %@",[carDic objectForKey:@"carseries"],[carDic objectForKey:@"license_number"] ];
+        currentKmLabel.text=[NSString stringWithFormat:@"里程:%@公里",[carDic objectForKey:@"current_mileage"]];
         
         if (requestTimes==1)
         {
             //[ToolLen ShowWaitingView:YES];
             requestTimes=1;
-            [[self JsonFactory] get_getServiceToDo:[[[carArray objectAtIndex:0] objectForKey:@"carid"] stringValue] action:@"getServiceToDo"];//待办服务
+            [[self JsonFactory] get_getServiceToDo:[[carDic objectForKey:@"carid"] stringValue] action:@"getServiceToDo"];//待办服务
             
         }
         else if (requestTimes==2)
         {
             //[ToolLen ShowWaitingView:YES];
             requestTimes=2;
-            [[self JsonFactory] get_getMaintainInfo:[[[carArray objectAtIndex:0] objectForKey:@"carid"] stringValue] action:@"getMaintainInfo"];//保养卡信息
+            [[self JsonFactory] get_getMaintainInfo:[[carDic objectForKey:@"carid"] stringValue] action:@"getMaintainInfo"];//保养卡信息
         }
         else if (requestTimes==3)
         {
             
             //[ToolLen ShowWaitingView:YES];
             requestTimes=3;
-            [[self JsonFactory] get_getRepairOrder:[[[carArray objectAtIndex:0] objectForKey:@"carid"] stringValue] action:@"getRepairOrderList"];//维修记录
+            [[self JsonFactory] get_getRepairOrder:[[carDic objectForKey:@"carid"] stringValue] action:@"getRepairOrderList"];//维修记录
         }
     }
 
 }
+/*
 -(void)viewWillAppear:(BOOL)animated
 {
     //NSLog(@"car::%@",carArray);
-    if (carArray.count==0)
+    if (carDic.count==0)
     {
         //选择车辆
         CarTypeViewController *type=[[CarTypeViewController alloc] init];
@@ -256,12 +263,13 @@
         [self.navigationController presentViewController:customNav animated:YES completion:^{
             
         }];
+        
     }
-    else if ([[[carArray objectAtIndex:0] objectForKey:@"license_number"] length]==0)
+    else if ([[carDic objectForKey:@"license_number"] length]==0)
     {
         //创建健康卡
         CreateHealthyCarViewController *create=[[CreateHealthyCarViewController alloc] init];
-        create.blindcarID=[[carArray objectAtIndex:0] objectForKey:@"carid"];
+        create.blindcarID=[carDic objectForKey:@"carid"];
         create.state=0;
         CustomNavigationController *customNav=[[CustomNavigationController alloc] initWithRootViewController:create];
         [self.navigationController presentViewController:customNav animated:YES completion:^{
@@ -273,6 +281,7 @@
         [MobClick event:@"healthyPage"];//统计健康卡页面
     }
 }
+*/
 
 - (void)viewDidLoad
 {
@@ -283,7 +292,7 @@
     //设置通知
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshUI) name:@"refreshUI" object:nil];
     
-    if (carArray.count==0)
+    if (carDic.count==0)
     {
         
     }
@@ -339,7 +348,7 @@
     else if (responseObject && [[responseObject objectForKey:@"errorcode"] intValue]==0 && requestTimes==5)//修改里程
     {
         
-        NSMutableDictionary *temp=[[NSMutableDictionary alloc] initWithDictionary:[carArray objectAtIndex:0]];
+        NSMutableDictionary *temp=[[NSMutableDictionary alloc] initWithDictionary:carDic];
        // NSLog(@"temp::%@",temp);
        // NSLog(@"currentKm:%@",currentKm);
         
@@ -350,6 +359,28 @@
         currentKmLabel.text=[NSString stringWithFormat:@"里程:%@公里",currentKm];
         [document saveDataToDocument:@"car" fileData:[NSArray arrayWithObject:temp]];
         
+    }
+    else
+    {
+        if (requestTimes==1)
+        {
+            todoArray=[[NSArray alloc] init];
+            
+            [healthyTableView reloadData];
+        }
+        else if(requestTimes==2)
+        {
+            mainteArray=[[NSMutableArray alloc]init];
+            [maintenanceTableView reloadData];
+            
+        }
+        else
+        {
+            repairArray=[[NSArray alloc]init];
+            
+            [repairTableView reloadData];//加载数据
+        }
+       // NSLog(@"都多多少少的：：%@",[responseObject objectForKey:@"message"]);
     }
     
 }
@@ -367,10 +398,12 @@
         //NSLog(@"修改公里数");
         if ([[userDic objectForKey:@"valid"] intValue]==0)
         {
+            alertPt=0;
             [self alertNoValid];
         }
         else
         {
+            alertPt=1;
             UIAlertView *alert=[[UIAlertView alloc] initWithTitle:nil
                                                           message:@"请输入新的里程数"
                                                          delegate:self
@@ -384,33 +417,40 @@
     }
     else if (sender.tag==11)
     {
+        /*
+         *
         //NSLog(@"开始预约");
         if ([[userDic objectForKey:@"valid"] intValue]==1)
         {
-           NSMutableArray *orderArray=[[NSMutableArray alloc] init];
-            for (int i=0; i<[todoMutableArray count]; i++)
-            {
-                if ([[todoMutableArray objectAtIndex:i] isEqualToString:@"1"])
-                {
-                    [orderArray addObject:[todoArray objectAtIndex:i]];
-                }
-            }
-           // NSLog(@"orderArray::%@",orderArray);
-    
+            alertPt=1;
+        
+            
             //服务网点
             ServiceStationViewController *controller=[[ServiceStationViewController alloc] init];
             controller.hidesBottomBarWhenPushed=YES;
             controller.title=@"预约服务网点";
             //controller.lat=lat;
             //controller.lng=lng;
-            controller.orderArray=orderArray;
+            //controller.orderArray=orderArray;
             controller.state=0;
             [self.navigationController pushViewController:controller animated:YES];
         }
         else
         {
+            alertPt=0;
             [self alertNoValid];
         }
+         */
+        
+        //服务网点
+        ServiceStationViewController *controller=[[ServiceStationViewController alloc] init];
+        controller.hidesBottomBarWhenPushed=YES;
+        controller.title=@"预约服务网点";
+        //controller.lat=lat;
+        //controller.lng=lng;
+        //controller.orderArray=orderArray;
+        controller.state=0;
+        [self.navigationController pushViewController:controller animated:YES];
         
     }
     else if(sender.tag>99)
@@ -480,7 +520,7 @@
             {
                 [ToolLen ShowWaitingView:YES];
                 requestTimes=1;
-                [[self JsonFactory] get_getServiceToDo:[[[carArray objectAtIndex:0] objectForKey:@"carid"] stringValue] action:@"getServiceToDo"];//待办服务
+                [[self JsonFactory] get_getServiceToDo:[[carDic objectForKey:@"carid"] stringValue] action:@"getServiceToDo"];//待办服务
                 
                 break;
             }
@@ -488,7 +528,7 @@
             {
                 [ToolLen ShowWaitingView:YES];
                 requestTimes=2;
-                [[self JsonFactory] get_getMaintainInfo:[[[carArray objectAtIndex:0] objectForKey:@"carid"] stringValue] action:@"getMaintainInfo"];//保养卡信息
+                [[self JsonFactory] get_getMaintainInfo:[[carDic objectForKey:@"carid"] stringValue] action:@"getMaintainInfo"];//保养卡信息
                 
                 break;
             }
@@ -497,7 +537,7 @@
                 
                 [ToolLen ShowWaitingView:YES];
                 requestTimes=3;
-                [[self JsonFactory] get_getRepairOrder:[[[carArray objectAtIndex:0] objectForKey:@"carid"] stringValue] action:@"getRepairOrderList"];//维修记录
+                [[self JsonFactory] get_getRepairOrder:[[carDic objectForKey:@"carid"] stringValue] action:@"getRepairOrderList"];//维修记录
                 break;
             }
                 
@@ -511,22 +551,38 @@
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    if (buttonIndex==1)
+    
+    //NSLog(@"sssdddddd");
+    if (alertPt==1)
     {
-        //得到输入框
-        UITextField *tf=[alertView textFieldAtIndex:0];
-       // NSLog(@"tf::%@",tf.text);
-        currentKm=tf.text;
-        if (tf.text.length>0)
+        if (buttonIndex==1)
         {
-            requestTimes=5;
-            [[self JsonFactory]setCarCurrentMileage:[[[carArray objectAtIndex:0] objectForKey:@"carid"] stringValue] currentMileage:tf.text action:@"setCarCurrentMileage"];
+            //得到输入框
+            UITextField *tf=[alertView textFieldAtIndex:0];
+            // NSLog(@"tf::%@",tf.text);
+            currentKm=tf.text;
+            if (tf.text.length>0)
+            {
+                requestTimes=5;
+                [[self JsonFactory]setCarCurrentMileage:[[carDic objectForKey:@"carid"] stringValue] currentMileage:tf.text action:@"setCarCurrentMileage"];
+            }
+            else
+            {
+                [self alertOnly:@"请输入里程数"];
+            }
+            
         }
-        else
+
+    }
+    else
+    {
+        if (buttonIndex==1)
         {
-            [self alertOnly:@"请输入里程数"];
+           // NSLog(@"登录");
+            LoginAndResigerViewController *guide=[[LoginAndResigerViewController alloc] init];
+            guide.hidesBottomBarWhenPushed=YES;
+            [self.navigationController pushViewController:guide animated:YES];
         }
-        
     }
 }
 
@@ -604,7 +660,8 @@
         {
              cell.backgroundColor=[UIColor colorWithRed:241.0/255.0 green:241.0/255.0 blue:241.0/255.0 alpha:1.0];
         }
-        
+        cell.checkImageView.hidden=YES;
+        /*
         if ([[todoMutableArray objectAtIndex:indexPath.row] isEqualToString:@"0"])
         {
             cell.checkImageView.image=IMAGE(@"unselected");
@@ -613,6 +670,7 @@
         {
             cell.checkImageView.image=IMAGE(@"selected");
         }
+        */
         
         cell.nameLabel.text=[[todoArray objectAtIndex:indexPath.row] objectForKey:@"name"];
         
@@ -626,9 +684,10 @@
             cell.stateLabel.text=@"普通";//普通
             cell.flagImageView.image=IMAGE(@"yellow");
         }
-        
+        /*
         cell.chooseButton.tag=indexPath.row;
         [cell.chooseButton addTarget:self action:@selector(choose:) forControlEvents:UIControlEventTouchUpInside];
+        */
         
         return cell;
     }
@@ -857,7 +916,7 @@
         }
         else
         {
-            [[self JsonFactory] get_updateMaintainInfo:[[[carArray objectAtIndex:0] objectForKey:@"carid"] stringValue] checkItem:[[[[[mainteArray objectAtIndex:bigIndex] objectForKey:@"items"] objectAtIndex:smallIndex] objectForKey:@"id"] stringValue] mileage:[NSString stringWithFormat:@"%d",mileage] period:[NSString stringWithFormat:@"%d",period] op:@"0" action:@"updateMaintainInfo"];
+            [[self JsonFactory] get_updateMaintainInfo:[[carDic objectForKey:@"carid"] stringValue] checkItem:[[[[[mainteArray objectAtIndex:bigIndex] objectForKey:@"items"] objectAtIndex:smallIndex] objectForKey:@"id"] stringValue] mileage:[NSString stringWithFormat:@"%d",mileage] period:[NSString stringWithFormat:@"%d",period] op:@"0" action:@"updateMaintainInfo"];
         }
         
         
@@ -889,7 +948,7 @@
         }
         else
         {
-            [[self JsonFactory] get_updateMaintainInfo:[[[carArray objectAtIndex:0] objectForKey:@"carid"] stringValue] checkItem:[[[[[mainteArray objectAtIndex:bigIndex] objectForKey:@"items"] objectAtIndex:smallIndex] objectForKey:@"id"] stringValue] mileage:[NSString stringWithFormat:@"%d",mileage] period:[NSString stringWithFormat:@"%d",period] op:@"1" action:@"updateMaintainInfo"];
+            [[self JsonFactory] get_updateMaintainInfo:[[carDic objectForKey:@"carid"] stringValue] checkItem:[[[[[mainteArray objectAtIndex:bigIndex] objectForKey:@"items"] objectAtIndex:smallIndex] objectForKey:@"id"] stringValue] mileage:[NSString stringWithFormat:@"%d",mileage] period:[NSString stringWithFormat:@"%d",period] op:@"1" action:@"updateMaintainInfo"];
             
         }
        

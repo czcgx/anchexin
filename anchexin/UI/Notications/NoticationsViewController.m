@@ -46,6 +46,15 @@
     // Do any additional setup after loading the view.
     [self skinOfBackground];
     
+    [self refreshAccount];
+    //NSLog(@"carDic::%@",carDic);
+    
+    if (carDic.count==0)
+    {
+        [self alertOnly:@"您未选择车辆"];
+        return;
+    }
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshUI2) name:@"refreshUI2" object:nil];
     
    
@@ -111,7 +120,7 @@
     [self.view addSubview:mainView];
     
     [ToolLen ShowWaitingView:YES];
-    [[self JsonFactory] getNoticeList:[[carArray objectAtIndex:0] objectForKey:@"carid"] type:@"0" action:@"getNoticeList"];//保养
+    [[self JsonFactory] getNoticeList:[carDic objectForKey:@"carid"] type:@"0" action:@"getNoticeList"];//保养
     
     
 }
@@ -129,11 +138,11 @@
     }
     else if (responseObject && [[responseObject objectForKey:@"errorcode"] intValue]==0 && requestTimes==15)
     {
-        [[self JsonFactory] getNoticeList:[[carArray objectAtIndex:0] objectForKey:@"carid"]  type:@"3" action:@"getNoticeList"];
+        [[self JsonFactory] getNoticeList:[carDic objectForKey:@"carid"]  type:@"3" action:@"getNoticeList"];
     }
     else if (responseObject && [[responseObject objectForKey:@"errorcode"] intValue]==0 && requestTimes==16)
     {
-        [[self JsonFactory] getNoticeList:[[carArray objectAtIndex:0] objectForKey:@"carid"]  type:@"2" action:@"getNoticeList"];
+        [[self JsonFactory] getNoticeList:[carDic objectForKey:@"carid"]  type:@"2" action:@"getNoticeList"];
     }
     else if (responseObject && [[responseObject objectForKey:@"errorcode"] intValue]==0 && pt==101)
     {
@@ -195,6 +204,13 @@
 
 -(void)customEvent:(UIButton *)sender
 {
+    if (carDic.count==0)
+    {
+        [self alertOnly:@"您未选择车辆"];
+        return;
+        
+    }
+    
     if (sender==nil)
     {
         pt=100;
@@ -233,7 +249,7 @@
                 tabLine.frame = CGRectMake(0, 40, 80, 10);
                 
                 [ToolLen ShowWaitingView:YES];
-                [[self JsonFactory] getNoticeList:[[carArray objectAtIndex:0] objectForKey:@"carid"]  type:@"0" action:@"getNoticeList"];
+                [[self JsonFactory] getNoticeList:[carDic objectForKey:@"carid"]  type:@"0" action:@"getNoticeList"];
                 
                 break;
             }
@@ -242,7 +258,7 @@
                 tabLine.frame = CGRectMake(80, 40, 80, 10);
                 
                 [ToolLen ShowWaitingView:YES];
-                [[self JsonFactory] getNoticeList:[[carArray objectAtIndex:0] objectForKey:@"carid"]  type:@"3" action:@"getNoticeList"];
+                [[self JsonFactory] getNoticeList:[carDic  objectForKey:@"carid"]  type:@"3" action:@"getNoticeList"];
                 
                 break;
             }
@@ -252,7 +268,7 @@
                 
                 
                 [ToolLen ShowWaitingView:YES];
-                [[self JsonFactory] getNoticeList:[[carArray objectAtIndex:0] objectForKey:@"carid"]  type:@"2" action:@"getNoticeList"];
+                [[self JsonFactory] getNoticeList:[carDic objectForKey:@"carid"]  type:@"2" action:@"getNoticeList"];
                 
                 break;
             }
@@ -261,7 +277,7 @@
                 tabLine.frame = CGRectMake(80*3, 40, 80, 10);
                 
                 [ToolLen ShowWaitingView:YES];
-                [[self JsonFactory] getNoticeList:[[carArray objectAtIndex:0] objectForKey:@"carid"]  type:@"1" action:@"getNoticeList"];
+                [[self JsonFactory] getNoticeList:[carDic objectForKey:@"carid"]  type:@"1" action:@"getNoticeList"];
                 
                 break;
             }
@@ -305,7 +321,15 @@
         //动态返回信息高度
         NSString *LabelString=[NSString stringWithFormat:@"%@",[[noticeList objectAtIndex:indexPath.row] objectForKey:@"content"]];
         CGSize constraint = CGSizeMake(260.0f, 20000.0f);//自己设置的要显示的长度
-        CGSize size = [LabelString sizeWithFont:[UIFont systemFontOfSize:15.0] constrainedToSize:constraint lineBreakMode:NSLineBreakByWordWrapping];
+        
+        /*
+        CGSize size = [LabelString  sizeWithFont:[UIFont systemFontOfSize:15.0] constrainedToSize:constraint lineBreakMode:NSLineBreakByWordWrapping];
+         */
+        
+        NSDictionary *attribute = @{NSFontAttributeName: [UIFont systemFontOfSize:15.0]};
+        CGSize size = [LabelString boundingRectWithSize:constraint options: NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:attribute context:nil].size;
+        
+        
         CGFloat height = MAX(size.height, 30.0f);//返回最大高度
         
         return 35+height+10;
@@ -321,7 +345,14 @@
             //动态返回信息高度
             NSString *LabelString=[NSString stringWithFormat:@"%@",[[noticeList objectAtIndex:indexPath.row-1] objectForKey:@"content"]];
             CGSize constraint = CGSizeMake(260.0f, 20000.0f);//自己设置的要显示的长度
+            
+            /*
             CGSize size = [LabelString sizeWithFont:[UIFont systemFontOfSize:15.0] constrainedToSize:constraint lineBreakMode:NSLineBreakByWordWrapping];
+             */
+            
+            NSDictionary *attribute = @{NSFontAttributeName: [UIFont systemFontOfSize:15.0]};
+            CGSize size = [LabelString boundingRectWithSize:constraint options: NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:attribute context:nil].size;
+            
             CGFloat height = MAX(size.height, 30.0f);//返回最大高度
             
             return 35+height+10;
@@ -359,7 +390,13 @@
         
         NSString *LabelString=[NSString stringWithFormat:@"%@",[[noticeList objectAtIndex:indexPath.row] objectForKey:@"content"]];
         CGSize constraint = CGSizeMake(260.0, 20000.0f);
+        /*
         CGSize size = [LabelString sizeWithFont:[UIFont systemFontOfSize:15.0] constrainedToSize:constraint lineBreakMode:NSLineBreakByWordWrapping];
+         */
+        
+        NSDictionary *attribute = @{NSFontAttributeName: [UIFont systemFontOfSize:15.0]};
+        CGSize size = [LabelString boundingRectWithSize:constraint options: NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:attribute context:nil].size;
+        
         CGFloat height = MAX(size.height, 30.0f);
         //NSLog(@"height::%f",height);
         cell.contentLabel.frame = CGRectMake(30,34, 260, height+10);//给label定位
@@ -441,8 +478,15 @@
             
             NSString *LabelString=[NSString stringWithFormat:@"%@",[[noticeList objectAtIndex:indexPath.row-1] objectForKey:@"content"]];
             CGSize constraint = CGSizeMake(260.0, 20000.0f);
+            /*
             CGSize size = [LabelString sizeWithFont:[UIFont systemFontOfSize:15.0] constrainedToSize:constraint lineBreakMode:NSLineBreakByWordWrapping];
+             */
+            
+            NSDictionary *attribute = @{NSFontAttributeName: [UIFont systemFontOfSize:15.0]};
+            CGSize size = [LabelString boundingRectWithSize:constraint options: NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:attribute context:nil].size;
+            
             CGFloat height = MAX(size.height, 30.0f);
+            
             //NSLog(@"height::%f",height);
             cell.contentLabel.frame = CGRectMake(30,34, 260, height+10);//给label定位
             [cell.contentLabel setNumberOfLines:0];//将label的行数设置为0，可以自动适应行数
@@ -463,10 +507,12 @@
 {
     if ([[userDic objectForKey:@"valid"] intValue]==0)
     {
+        alertPt=0;
         [self alertNoValid];
     }
     else
     {
+        alertPt=1;
         UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"请输入新的日期"
                                                       message:@"格式:2014-08-08"
                                                      delegate:self
@@ -481,43 +527,58 @@
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    if (buttonIndex==1)
+    if (alertPt==1)
     {
-        //得到输入框
-        UITextField *tf=[alertView textFieldAtIndex:0];
-       // NSLog(@"tf::%@",tf.text);
-       
-        if (tf.text.length==10)
+        if (buttonIndex==1)
         {
-           // 使用NSString *strUrl = [urlString stringByReplacingOccurrencesOfString:@" " withString:@""];
-            NSString *tempString=[NSString stringWithFormat:@"%@-%@-%@",[[tf.text substringFromIndex:0] substringToIndex:4],[[tf.text substringFromIndex:5] substringToIndex:2],[[tf.text substringFromIndex:8] substringToIndex:2]];
+            //得到输入框
+            UITextField *tf=[alertView textFieldAtIndex:0];
+            // NSLog(@"tf::%@",tf.text);
             
-            //tf.text=[tf.text stringByReplacingOccurrencesOfString:@"——" withString:@"-"];
-            
-            NSLog(@"tempString::%@",tempString);
-            
-            if (tf.text.length>0 && pt==101)//年检
+            if (tf.text.length==10)
             {
+                // 使用NSString *strUrl = [urlString stringByReplacingOccurrencesOfString:@" " withString:@""];
+                NSString *tempString=[NSString stringWithFormat:@"%@-%@-%@",[[tf.text substringFromIndex:0] substringToIndex:4],[[tf.text substringFromIndex:5] substringToIndex:2],[[tf.text substringFromIndex:8] substringToIndex:2]];
                 
-                requestTimes=15;
-                [[self JsonFactory] changeInspectDate:tempString car:[[[carArray objectAtIndex:0] objectForKey:@"carid"] stringValue] action:@"changeInspectDate"];
-            }
-            else if (tf.text.length>0 && pt==102)//保险
-            {
-                requestTimes=16;
-                [[self JsonFactory]changeInsuranceDate:tempString car:[[[carArray objectAtIndex:0] objectForKey:@"carid"] stringValue] action:@"changeInsuranceDate"];
+                //tf.text=[tf.text stringByReplacingOccurrencesOfString:@"——" withString:@"-"];
+                
+                //NSLog(@"tempString::%@",tempString);
+                
+                if (tf.text.length>0 && pt==101)//年检
+                {
+                    
+                    requestTimes=15;
+                    [[self JsonFactory] changeInspectDate:tempString car:[[carDic objectForKey:@"carid"] stringValue] action:@"changeInspectDate"];
+                }
+                else if (tf.text.length>0 && pt==102)//保险
+                {
+                    requestTimes=16;
+                    [[self JsonFactory]changeInsuranceDate:tempString car:[[carDic objectForKey:@"carid"] stringValue] action:@"changeInsuranceDate"];
+                }
+                else
+                {
+                    [self alertOnly:@"请输入相应日期"];
+                }
+                
             }
             else
             {
-                [self alertOnly:@"请输入相应日期"];
+                [self alertOnly:@"请参照格式输入"];
             }
+            
+        }
 
-        }
-        else
+    }
+    else
+    {
+        if (buttonIndex==1)
         {
-            [self alertOnly:@"请参照格式输入"];
+            //NSLog(@"登录");
+            LoginAndResigerViewController *guide=[[LoginAndResigerViewController alloc] init];
+            guide.hidesBottomBarWhenPushed=YES;
+            [self.navigationController pushViewController:guide animated:YES];
         }
-        
+
     }
 }
 

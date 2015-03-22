@@ -11,18 +11,18 @@
 @interface ActivitiyCell : UITableViewCell
 {
     IBOutlet UIImageView *shopImageView;
+    
     IBOutlet UILabel *activityNameLabel;
-    IBOutlet UILabel *shopNameLabel;
-    IBOutlet UILabel *carNameLabel;
-    IBOutlet UILabel *timeLabel;
-    IBOutlet UILabel *isRequest;
+    IBOutlet UILabel *activitydesLabel;
+    IBOutlet UILabel *activityDiscountLabel;
+
 }
 
 @property(nonatomic,retain)UIImageView *shopImageView;
+
 @property(nonatomic,retain)UILabel *activityNameLabel;
-@property(nonatomic,retain)UILabel *shopNameLabel;
-@property(nonatomic,retain)UILabel *carNameLabel;
-@property(nonatomic,retain)UILabel *timeLabel;
-@property(nonatomic,retain)UILabel *isRequest;
+@property(nonatomic,retain)UILabel *activitydesLabel;
+@property(nonatomic,retain)UILabel *activityDiscountLabel;
+
 
 @end

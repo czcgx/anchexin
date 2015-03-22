@@ -10,12 +10,15 @@
 
 @interface CommentCell : UITableViewCell
 {
-    IBOutlet UIImageView *img;
-    IBOutlet UILabel *commentLabel;
+    IBOutlet UIView *commentView;
+    IBOutlet UILabel *commentNameLabel;
+    IBOutlet UILabel *commentDateLabel;
+    IBOutlet UILabel *commentContentLabel;
     
 }
-
-@property(nonatomic,retain)UIImageView *img;
-@property(nonatomic,retain)UILabel *commentLabel;
+@property(nonatomic,retain)UIView *commentView;
+@property(nonatomic,retain)UILabel *commentNameLabel;
+@property(nonatomic,retain)UILabel *commentDateLabel;
+@property(nonatomic,retain)UILabel *commentContentLabel;
 
 @end

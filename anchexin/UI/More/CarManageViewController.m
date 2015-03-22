@@ -62,14 +62,24 @@
     {
         if ([[userDic objectForKey:@"valid"] intValue]==0)
         {
+            alertPt=0;
             [self alertNoValid];
         }
         else
         {
+            /*
             //选择车辆
             CarTypeViewController *type=[[CarTypeViewController alloc] init];
             type.state=1;
             [self.navigationController pushViewController:type animated:YES];
+             */
+            
+            CarInfoViewController *car=[[CarInfoViewController alloc] init];
+            car.title=@"车辆信息";
+            car.flag=false;
+            
+            [self.navigationController pushViewController:car animated:YES];
+            
         }
        
     }
@@ -84,7 +94,7 @@
         
         manageArray=[[NSArray alloc] initWithArray:[responseObject objectForKey:@"carlist"]];
         
-       // NSLog(@"manageArray::%@",manageArray);
+        //NSLog(@"manageArray::%@",manageArray);
         
         [manageTableView reloadData];
     }
@@ -173,12 +183,26 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
-    [AppDelegate setGlobal].changCarId=[[manageArray objectAtIndex:indexPath.row] objectForKey:@"carid"];//更换车的id
     
-    //刷新切换车辆
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"changeCar" object:nil];
-    
-     [[AppDelegate setGlobal].rootController setRootController:[AppDelegate setGlobal].tabBarController animated:YES];
+    if ([[[manageArray objectAtIndex:indexPath.row] objectForKey:@"current_mileage"] intValue]==0 || [[[manageArray objectAtIndex:indexPath.row]objectForKey:@"license_number"] isEqualToString:@""])
+    {
+       
+        CarInfoViewController *car=[[CarInfoViewController alloc] init];
+        car.title=@"车辆信息";
+        car.carInfo=[manageArray objectAtIndex:indexPath.row];
+        car.flag=true;
+        [self.navigationController pushViewController:car animated:YES];
+    }
+    else
+    {
+        [AppDelegate setGlobal].changCarId=[[manageArray objectAtIndex:indexPath.row] objectForKey:@"carid"];//更换车的id
+        
+        //刷新切换车辆
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"changeCar" object:nil];
+        
+        [[AppDelegate setGlobal].rootController setRootController:[AppDelegate setGlobal].tabBarController animated:YES];
+        
+    }
     
 }
 
@@ -187,10 +211,12 @@
 {
     if ([[userDic objectForKey:@"valid"] intValue]==0)
     {
+        alertPt=0;
         [self alertNoValid];
     }
     else
     {
+        alertPt=1;
         index=(int)sender.tag;
         
         UIAlertView *alert=[[UIAlertView alloc] initWithTitle:nil
@@ -207,17 +233,38 @@
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    if (buttonIndex==1)
+    if (alertPt==1)
     {
-        //得到输入框
-        UITextField *tf=[alertView textFieldAtIndex:0];
-        //NSLog(@"tf::%@",tf.text);
-        currentNumber=tf.text;
-        if (tf.text.length>0)
+        if (buttonIndex==1)
         {
-            requestTimes=2;
-            
-            [[self JsonFactory] setLicenseNumberByCar:[[[manageArray objectAtIndex:index] objectForKey:@"carid"] stringValue] licenseNumber:tf.text action:@"setLicenseNumberByCar"];
+            //得到输入框
+            UITextField *tf=[alertView textFieldAtIndex:0];
+            //NSLog(@"tf::%@",tf.text);
+            currentNumber=tf.text;
+            if (tf.text.length>0 && tf.text.length==7)
+            {
+                requestTimes=2;
+                
+                [[self JsonFactory] setLicenseNumberByCar:[[[manageArray objectAtIndex:index] objectForKey:@"carid"] stringValue] licenseNumber:tf.text action:@"setLicenseNumberByCar"];
+            }
+            else
+            {
+                [self alertOnly:@"请输入正确的车牌号"];
+            }
+        }
+
+    }
+    else
+    {
+        if (alertPt==0)
+        {
+            if (buttonIndex==1)
+            {
+                //NSLog(@"登录");
+                LoginAndResigerViewController *guide=[[LoginAndResigerViewController alloc] init];
+                guide.hidesBottomBarWhenPushed=YES;
+                [self.navigationController pushViewController:guide animated:YES];
+            }
         }
 
     }

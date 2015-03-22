@@ -15,6 +15,8 @@
     UITableView *accountTableView;
     NSArray *accountArray;
     
+    int alertPt;
+    
 }
 
 @end

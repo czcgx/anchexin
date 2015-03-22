@@ -12,9 +12,11 @@
 #import "MoreViewController.h"
 #import "CarChooseCell.h"
 
-#import "LoginGuideViewController.h"
+#import "LoginAndResigerViewController.h"
 
-@interface HomeViewController : BaseViewController<UITableViewDataSource, UITableViewDelegate>
+#import "ANBlurredImageView.h"
+
+@interface HomeViewController : BaseViewController<UITableViewDataSource, UITableViewDelegate,UIAlertViewDelegate>
 {
     UITableView *homeTableView;
     
@@ -25,7 +27,10 @@
     UIImageView *carIconImageView;//当前车辆图标
     UILabel *carIconLabel;//当前车辆车牌号
     
-    DKLiveBlurView *backgroundView;
+    //DKLiveBlurView *backgroundView;
+    ANBlurredImageView *backgroundView;
+   //UIImageView *backgroundView;
+    
     
     int requestTimes;
     
@@ -42,6 +47,9 @@
     
     UIView *popView;
     NSArray *carListArray;
+    
+    UILabel *requestLabel;
+    
     
 }
 

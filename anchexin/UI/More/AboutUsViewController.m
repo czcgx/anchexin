@@ -39,11 +39,26 @@
     des.numberOfLines=0;
     [self.view addSubview:des];
     
-    [self.view addSubview:[self customLabel:CGRectMake(0, img.frame.size.height-40, WIDTH, 20) color:[UIColor whiteColor] text:@"v2.0.0" alignment:0 font:12.0]];
+    [self.view addSubview:[self customLabel:CGRectMake(0, img.frame.size.height-80, WIDTH, 20) color:[UIColor whiteColor] text:@"4000052270" alignment:0 font:18.0]];
+    [self.view addSubview:[self customButton:CGRectMake(0,  img.frame.size.height-90, WIDTH, 40) tag:1 title:nil state:0 image:nil selectImage:nil color:nil enable:YES]];
+    
+    
+    [self.view addSubview:[self customLabel:CGRectMake(0, img.frame.size.height-40, WIDTH, 20) color:[UIColor whiteColor] text:anchexinVersion alignment:0 font:12.0]];
     
     
     
     
+}
+
+-(void)customEvent:(UIButton *)sender
+{
+    if (sender.tag==1)
+    {
+        UIWebView*callWebview =[[UIWebView alloc] init] ;
+        NSURL *telURL =[NSURL URLWithString:[NSString stringWithFormat:@"tel://%@",@"4000052270"]];
+        [callWebview loadRequest:[NSURLRequest requestWithURL:telURL]];
+        [self.view addSubview:callWebview];
+    }
 }
 
 - (void)didReceiveMemoryWarning

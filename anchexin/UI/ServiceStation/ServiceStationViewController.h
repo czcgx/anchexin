@@ -8,8 +8,7 @@
 
 #import "BaseViewController.h"
 #import "ServiceCell.h"
-
-#import "StationInfoViewController.h"
+#import "New_StationInfoViewController.h"
 
 #import "ACNavBarDrawer.h"//弹出视图
 
@@ -41,6 +40,8 @@
     UIImageView *searchIconImageView;
     UIView *searchView;
     BOOL searchBool;
+    
+    int pt;
     
 }
 

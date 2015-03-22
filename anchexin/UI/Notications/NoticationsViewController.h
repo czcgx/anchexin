@@ -26,6 +26,7 @@
     
     UILabel *desLabel;
     
+    int alertPt;
 }
 
 

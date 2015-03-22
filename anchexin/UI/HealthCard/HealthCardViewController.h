@@ -50,6 +50,7 @@
     UIImageView *img;
     UILabel *lb1;
     
+    int alertPt;
 }
 
 @end

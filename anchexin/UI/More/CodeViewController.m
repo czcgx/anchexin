@@ -35,11 +35,12 @@
     mainView.backgroundColor=kUIColorFromRGB(Commonbg);
     
     
-    UIImageView *img=[[UIImageView alloc] initWithFrame:CGRectMake(60, mainView.frame.size.height/2-100, 200, 200)];
-    [img setImageWithURL:[NSURL URLWithString:[userDic objectForKey:@"qrurl"]] placeholderImage:nil];
+    UIImageView *img=[[UIImageView alloc] initWithFrame:CGRectMake(10, mainView.frame.size.height/2-150, 300,300)];
+    //[img setImageWithURL:[NSURL URLWithString:[userDic objectForKey:@"qrurl"]] placeholderImage:nil];
+    [img sd_setImageWithURL:[NSURL URLWithString:[userDic objectForKey:@"qrurl"]] placeholderImage:nil];
     [mainView addSubview:img];
     
-    [mainView addSubview:[self customLabel:CGRectMake(0, mainView.frame.size.height/2+130, WIDTH, 20) color:[UIColor darkGrayColor] text:@"用户个人身份识别" alignment:0 font:13.0]];
+    [mainView addSubview:[self customLabel:CGRectMake(0, mainView.frame.size.height/2+170, WIDTH, 20) color:[UIColor darkGrayColor] text:@"用户个人身份识别" alignment:0 font:16.0]];
     
     [self.view addSubview:mainView];
     

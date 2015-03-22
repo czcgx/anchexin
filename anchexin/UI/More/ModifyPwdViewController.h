@@ -17,6 +17,8 @@
     int requestTimes;
     NSString *phoneNumber;
     
+    int alertPt;
+    
 }
 
 @property(nonatomic,assign)int tag;
